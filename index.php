@@ -1,5 +1,5 @@
 <?php
 
-use Nnt\Manager\App;
+include_once "nnt/manager/app.php";
 
-(new App())->start();
+(new \Nnt\Manager\App())->start();
