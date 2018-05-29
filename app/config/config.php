@@ -1,11 +1,12 @@
 <?php
 
-use \Nnt\Core\Config;
-
-defined('MODULE_DIR') || define('MODULE_DIR', dirname(__DIR__) . '/');
-defined('APP_DIR') || define('APP_DIR', dirname(dirname(__DIR__)) . '/');
+use Nnt\Core\Config;
 
 $cfg = [];
+
+$cfg['server'] = [
+    'port' => Config::Use(8090, 80, 80)
+];
 
 $cfg['database'] = [
     "adapter" => "Mysql",
@@ -24,12 +25,6 @@ $cfg['redis'] = [
     "auth" => "root",
     "prefix" => "fp_",
     "persistent" => true
-];
-
-$cfg['application'] = [
-    "controllersDir" => MODULE_DIR . "controller",
-    "modelsDir" => MODULE_DIR . "model",
-    "viewsDir" => MODULE_DIR . "view"
 ];
 
 return new Config($cfg);
