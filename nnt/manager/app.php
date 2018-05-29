@@ -3,6 +3,8 @@
 namespace Nnt\Manager;
 
 // 引入基础文件
+use Nnt\Core\Config;
+
 define('WORKDIRECTORY', dirname(dirname(dirname(__FILE__))));
 
 // 自动加载需要的文件
@@ -15,15 +17,23 @@ spl_autoload_register(function ($classname) {
 
 class App
 {
-    function __construct()
+    function __construct(string $appname)
     {
         self::$shared = $this;
+        include_once WORKDIRECTORY . "/$appname/index.php";
     }
 
     static $shared;
 
-    function start(string $appname)
+    function config(Config $cfg)
     {
-        include_once WORKDIRECTORY . "/$appname/index.php";
+        $this->_cfg = $cfg;
+    }
+
+    protected $_cfg;
+
+    function start()
+    {
+
     }
 }

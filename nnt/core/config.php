@@ -32,4 +32,8 @@ class Config
         return getenv('DEVOPS_RELEASE') == null && getenv('DEVOPS') != null;
     }
 
+    function __construct(array $setting)
+    {
+
+    }
 }
