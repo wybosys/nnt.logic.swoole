@@ -17,17 +17,16 @@ spl_autoload_register(function ($classname) {
 
 class App
 {
-    function __construct(string $appname)
+    function __construct()
     {
         self::$shared = $this;
-        include_once WORKDIRECTORY . "/$appname/index.php";
     }
 
     static $shared;
 
-    function config(Config $cfg)
+    function config()
     {
-        $this->_cfg = $cfg;
+
     }
 
     protected $_cfg;
