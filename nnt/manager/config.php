@@ -4,7 +4,6 @@ namespace Nnt\Manager;
 
 class Config
 {
-
     // DEBUG模式
     static $DEBUG = false;
 
@@ -58,42 +57,42 @@ class Config
 
     // 最大下载文件的大小
     static $FILESIZE_LIMIT = 10485760; // 10M
-}
 
-// 判断是否是开发版
-function IsDebug()
-{
-    return Config::$DEBUG || Config::$DEVELOP || Config::$PUBLISH;
-}
+    // 判断是否是开发版
+    static function IsDebug()
+    {
+        return Config::$DEBUG || Config::$DEVELOP || Config::$PUBLISH;
+    }
 
-// 是否是正式版
-function IsRelease()
-{
-    return Config::$DISTRIBUTION;
-}
+    // 是否是正式版
+    static function IsRelease()
+    {
+        return Config::$DISTRIBUTION;
+    }
 
-function DebugValue($d, $r)
-{
-    return Config::$DISTRIBUTION ? $r : $d;
-}
+    static function DebugValue($d, $r)
+    {
+        return Config::$DISTRIBUTION ? $r : $d;
+    }
 
-// 支持DEVOPS的架构判断
-function IsDevops()
-{
-    return getenv('DEVOPS') != null;
-}
+    // 支持DEVOPS的架构判断
+    static function IsDevops()
+    {
+        return getenv('DEVOPS') != null;
+    }
 
-function IsDevopsDevelop()
-{
-    return getenv('DEVOPS') != null && getenv('DEVOPS_RELEASE') == null;
-}
+    static function IsDevopsDevelop()
+    {
+        return getenv('DEVOPS') != null && getenv('DEVOPS_RELEASE') == null;
+    }
 
-function IsDevopsRelease()
-{
-    return getenv('DEVOPS_RELEASE') != null;
-}
+    static function IsDevopsRelease()
+    {
+        return getenv('DEVOPS_RELEASE') != null;
+    }
 
-function IsLocal()
-{
-    return getenv('DEVOPS') == null;
+    static function IsLocal()
+    {
+        return getenv('DEVOPS') == null;
+    }
 }

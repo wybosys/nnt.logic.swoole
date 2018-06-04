@@ -2,9 +2,9 @@
 
 namespace Nnt\Manager;
 
-// 引入基础文件
-use Nnt\Core\Config;
+use Nnt\Config\AppNodes;
 
+// 当前工作目录
 define('WORKDIRECTORY', dirname(dirname(dirname(__FILE__))));
 
 // 自动加载需要的文件
@@ -24,14 +24,10 @@ class App
 
     static $shared;
 
-    function config()
-    {
-
-    }
-
-    protected $_cfg;
-
-    function start()
+    /**
+     * @return AppNodes
+     */
+    static function LoadConfig(string $appcfg = "~/app.json", string $devcfg = "~/devops.json")
     {
 
     }

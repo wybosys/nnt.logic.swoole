@@ -2,7 +2,7 @@
 
 namespace Nnt\Config;
 
-class App
+class AppNodes
 {
     /**
      * @var object 全局配置的节点
