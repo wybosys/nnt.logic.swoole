@@ -3,6 +3,7 @@
 namespace Nnt\Manager;
 
 use Nnt\Config\AppNodes;
+use Nnt\Core\Urls;
 
 // 当前工作目录
 define('WORKDIRECTORY', dirname(dirname(dirname(__FILE__))));
@@ -29,6 +30,11 @@ class App
      */
     static function LoadConfig(string $appcfg = "~/app.json", string $devcfg = "~/devops.json")
     {
+        $appcfg = Urls::Expand($appcfg);
+        if ($devcfg)
+            $devcfg = Urls::Expand($devcfg);
+
+        $cfg = json_decode(file_get_contents($appcfg));
 
     }
 }
