@@ -19,4 +19,3 @@ class Node
      */
     public $enable;
 }
-
