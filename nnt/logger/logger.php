@@ -5,49 +5,49 @@ namespace Nnt\Logger;
 class Logger
 {
     // 全都是匿名函数
-    static public $log;
+    static $log;
 
-    static public function Log(string $msg)
+    static function Log(string $msg)
     {
-        return self::$log($msg);
+        return (self::$log)($msg);
     }
 
-    static public $warn;
+    static $warn;
 
-    static public function Warn(string $msg)
+    static function Warn(string $msg)
     {
-        return self::$warn($msg);
+        return (self::$warn)($msg);
     }
 
-    static public $info;
+    static $info;
 
-    static public function Info(string $msg)
+    static function Info(string $msg)
     {
-        return self::$info($msg);
+        return (self::$info)($msg);
     }
 
-    static public $fatal;
+    static $fatal;
 
-    static public function Fatal(string $msg)
+    static function Fatal(string $msg)
     {
-        return self::$fatal($msg);
+        return (self::$fatal)($msg);
     }
 
-    static public $exception;
+    static $exception;
 
-    static public function Exception(\Throwable $err)
+    static function Exception(\Throwable $err)
     {
-        return self::$exception($err);
+        return (self::$exception)($err);
     }
 
-    static public $error;
+    static $error;
 
-    static public function Error(\ErrorException $err)
+    static function Error(\ErrorException $err)
     {
-        return self::$error($err);
+        return (self::$error)($err);
     }
 
-    static public function Assert($v, string $msg)
+    static function Assert($v, string $msg)
     {
         if (!$v) {
             echo $msg;

@@ -74,7 +74,7 @@ class App
         }
 
         // 缓存目录
-        if (is_dir(Config::$CACHE))
+        if (!is_dir(Config::$CACHE))
             mkdir(Config::$CACHE);
 
         return self::$CurrentConfig;
