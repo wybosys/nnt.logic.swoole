@@ -18,7 +18,7 @@ class Rest extends Server implements IRouterable, IHttpServer
         return new EmptyTransaction();
     }
 
-    function config($cfg): boolean
+    function config($cfg): bool
     {
         if (!parent::config($cfg))
             return false;

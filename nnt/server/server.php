@@ -14,7 +14,7 @@ abstract class Server
      * @param $cfg
      * @return bool
      */
-    function config($cfg)
+    function config($cfg): bool
     {
         if (!isset($cfg->id))
             return false;
