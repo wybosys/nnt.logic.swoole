@@ -9,10 +9,15 @@ class App
 {
     function __construct()
     {
-        self::$shared = $this;
+        self::$_shared = $this;
     }
 
-    static $shared;
+    private static $_shared;
+
+    function shared()
+    {
+        return self::$_shared;
+    }
 
     /**
      * @var object 当前配置
@@ -79,4 +84,16 @@ class App
 
         return self::$CurrentConfig;
     }
+
+    function start()
+    {
+        $cfg = App::$CurrentConfig;
+        if (isset($cfg->logger))
+            Loggers::Start($cfg->logger);
+        if (isset($cfg->dbms))
+            Dbmss::Start($cfg->dbms);
+        if (isset($cfg->server))
+            Servers::Start($cfg->server);
+    }
+
 }
