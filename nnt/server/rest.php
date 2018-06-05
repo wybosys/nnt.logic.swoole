@@ -62,7 +62,7 @@ class Rest extends Server implements IRouterable, IHttpServer
 
     function start(callable $cb)
     {
-
+        
     }
 
     protected $_routers;
