@@ -2,13 +2,14 @@
 
 namespace Nnt\Server;
 
+use Nnt\Core\DateTime;
 use Nnt\Core\STATUS;
 
 abstract class Transaction
 {
     function __construct()
     {
-
+        $this->time = DateTime::Now();
     }
 
     // 返回事务用来区分客户端的id，通常业务中实现为sid
@@ -62,4 +63,9 @@ abstract class Transaction
     // 基于哪个服务器运行
     public $server;
 
+    // 是否暴露接口（通常只有登录会设置为true)
+    public $expose;
+
+    // 此次的时间
+    public $time;
 }
