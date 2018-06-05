@@ -4,17 +4,16 @@ namespace Nnt\Core;
 
 use Nnt\Logger\Logger;
 
-$ROOT = '/';
-$HOME = getcwd();
-
 class Urls
 {
+    static $ROOT;
+    static $HOME;
 
     private static $schemes = [];
 
     static function RegisterScheme(string $scheme, $proc)
     {
-        $schemes[$scheme] = $proc;
+        self::$schemes[$scheme] = $proc;
     }
 
     // 展开url
@@ -32,14 +31,11 @@ class Urls
             return $proc($ps[1]);
         }
 
-        global $HOME;
-        global $ROOT;
-
         $ps = explode('/', $url);
         if ($ps[0] == "~")
-            $ps[0] = $HOME;
+            $ps[0] = self::$HOME;
         else if ($ps[0] == "")
-            $ps[0] = $ROOT;
+            $ps[0] = self::$ROOT;
         else {
             return $url;
         }
@@ -53,6 +49,10 @@ class Urls
 Urls::RegisterScheme("http", function ($body) {
     return $body;
 });
+
 Urls::RegisterScheme("https", function ($body) {
     return $body;
 });
+
+Urls::$ROOT = '/';
+Urls::$HOME = getcwd();
