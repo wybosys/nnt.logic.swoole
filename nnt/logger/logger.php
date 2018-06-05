@@ -56,19 +56,19 @@ class Logger
 }
 
 Logger::$log = function (string $msg) {
-    echo $msg;
+    echo $msg . "\n";
 };
 
 Logger::$warn = function (string $msg) {
-    echo $msg;
+    echo $msg . "\n";
 };
 
 Logger::$info = function (string $msg) {
-    echo $msg;
+    echo $msg . "\n";
 };
 
 Logger::$fatal = function (string $msg) {
-    echo $msg;
+    echo $msg . "\n";
 };
 
 Logger::$exception = function (\Throwable $err) {
