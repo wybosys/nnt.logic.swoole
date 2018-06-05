@@ -5,11 +5,6 @@ namespace Nnt\Server;
 use Nnt\Core\IRouter;
 use Nnt\Logger\Logger;
 
-interface IRouterable
-{
-    function routers(): Routers;
-}
-
 class Routers
 {
     protected $_routers = [];

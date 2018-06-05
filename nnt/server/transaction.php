@@ -68,4 +68,21 @@ abstract class Transaction
 
     // 此次的时间
     public $time;
+
+    // 是否已经授权
+    abstract function auth(): boolean;
+}
+
+class EmptyTransaction extends Transaction
+{
+
+    function sessionId(): string
+    {
+        return null;
+    }
+
+    function auth(): boolean
+    {
+        return false;
+    }
 }
