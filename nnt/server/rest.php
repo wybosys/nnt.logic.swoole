@@ -59,10 +59,15 @@ class Rest extends Server implements IRouterable, IHttpServer
     public $listen;
     public $port;
     public $router;
+    protected $_hdl;
 
     function start(callable $cb)
     {
-        
+        $hdl = new \Swoole\Http\Server($this->listen ? $this->listen : "0.0.0.0", $this->port);
+        $hdl->on('request', function (\Swoole\Http\Request $req, \Swoole\Http\Response $rsp) {
+            $rsp->end();
+        });
+        $hdl->start();
     }
 
     protected $_routers;
