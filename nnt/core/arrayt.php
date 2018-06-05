@@ -10,7 +10,7 @@ class ArrayT
      * @param $filter ($each, $index)
      * @return object
      */
-    static function QueryObject($arr, $filter)
+    static function QueryObject($arr, callable $filter)
     {
         if ($arr) {
             for ($i = 0, $l = count($arr); $i < $l; ++$i) {
@@ -22,7 +22,7 @@ class ArrayT
         return null;
     }
 
-    static function Convert($arr, $to, $skipnull = false)
+    static function Convert($arr, callable $to, $skipnull = false)
     {
         $ret = [];
         if ($arr) {
