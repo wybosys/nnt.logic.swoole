@@ -2,9 +2,22 @@
 
 namespace Nnt\Server;
 
-class Rest extends Server
+class Rest extends Server implements IRouterable, IHttpServer
 {
-    function start(callable $cb) {
+    function __construct()
+    {
+        $this->_routers = new Routers();
+    }
 
+    function start(callable $cb)
+    {
+
+    }
+
+    protected $_routers;
+
+    function routers(): Routers
+    {
+        return $this->_routers;
     }
 }
