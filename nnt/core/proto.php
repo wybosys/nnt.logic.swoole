@@ -227,6 +227,11 @@ class Proto
         foreach ($mi->fields as $fnm => $finfo) {
             if (!$finfo->input)
                 continue;
+            if ($finfo->optional)
+                continue;
+            $inp = ObjectT::Get($params, $fnm, null);
+            if ($inp === null)
+                return STATUS::PARAMETER_NOT_MATCH;
         }
         return STATUS::OK;
     }
