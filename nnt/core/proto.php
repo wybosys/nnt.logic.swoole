@@ -6,6 +6,7 @@ class FieldInfo
 {
     // 唯一序号，后续类似pb的协议会使用id来做数据版本兼容
     public $id;
+    public $name;
 
     // 可选
     public $optional;
@@ -195,10 +196,19 @@ class Proto
             $matches[1] = '[]';
         eval("\$ret = call_user_func('\Nnt\Core\model', $matches[1], '$matches[2]');");
 
-        $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
-        foreach ($methods as $fname => $finfo) {
-            $plain = $finfo->getDocComment();
+        $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
+        foreach ($props as $pname => $pinfo) {
+            $plain = $pinfo->getDocComment();
+            // 给所有类加上‘’，然后再调用函数
+            if (!preg_match('/@([a-zA-Z]+)\((.+)\)/', $plain, $matches))
+                continue;
+            $func = '\Nnt\Core\\' . $matches[1] . "_";
+            $args = preg_replace('/((?:\\\\[a-zA-Z]+)+)/', "'$0'", $matches[2]);
 
+            $fi = null;
+            eval("\$fi = call_user_func($func, $args);");
+            $fi->name = $pname;
+            $ret->fields[$fi->name] = $fi;
         }
 
         return $ret;

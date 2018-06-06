@@ -8,6 +8,7 @@ namespace Nnt\Core;
  */
 class Nil
 {
+
 }
 
 /**
