@@ -117,8 +117,8 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         $t = $this->instanceTransaction();
         try {
             $t->server = $this;
-            $t->action = $action;
             $t->params = $params;
+            $t->setAction($action);
 
             // 从请求中保存下信息
             if ($req) {

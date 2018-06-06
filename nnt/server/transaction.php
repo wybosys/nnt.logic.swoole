@@ -4,6 +4,7 @@ namespace Nnt\Server;
 
 use Nnt\Core\DateTime;
 use Nnt\Core\IRouter;
+use Nnt\Core\ObjectT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
@@ -41,8 +42,8 @@ abstract class Transaction
     {
         $this->_action = $act;
         $p = explode(".", $this->_action);
-        $this->router = strtolower((p[0] || "null"));
-        $this->call = strtolower((p[1] || "null"));
+        $this->router = strtolower(ObjectT::Get($p, 0, "null"));
+        $this->call = strtolower(ObjectT::Get($p, 1, "null"));
     }
 
     // 映射到router的执行器中

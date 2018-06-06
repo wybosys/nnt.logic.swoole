@@ -30,7 +30,7 @@ class Routers
 
     function find($id)
     {
-        return isset($this->_routers[$id]) ? $this->_routers[$id] : null;
+        return ObjectT::Get($this->_routers, $id);
     }
 
     function process(Transaction $trans)
