@@ -214,9 +214,94 @@ class Proto
         return $ret;
     }
 
-    static function Output($obj)
+    static function Output($mdl)
     {
-        return null;
+        if (!$mdl)
+            return null;
+        $mi = self::Get($mdl);
+        if (!$mi)
+            return null;
+        $r = [];
+        foreach ($mi->fields as $fk => $fp) {
+            if (!$fp->output || !isset($mdl[$fk])) // 不能和客户端一样删除掉对fk的判断，服务端会使用model直接扔到数据库中查询，去掉后会生成初始值查询字段
+                continue;
+            $val = $mdl[$fk];
+            if ($fp->valtype) {
+                if ($fp->array) {
+                    // 通用类型，则直接可以输出
+                    if (in_array($fp->valtype, self::POD_TYPES)) {
+                        $arr = [];
+                        if ($fp->valtype == "string") {
+                            foreach ($val as $e) {
+                                $arr[] = $e ? (string)$e : null;
+                            }
+                        } else if ($fp->valtype == "integer") {
+                            foreach ($val as $e) {
+                                $arr[] = $e ? (int)$e : null;
+                            }
+                        } else if ($fp->valtype == "double") {
+                            foreach ($val as $e) {
+                                $arr[] = $e ? (double)$e : null;
+                            }
+                        } else if ($fp->valtype == "boolean") {
+                            foreach ($val as $e) {
+                                $arr[] = !!$e;
+                            }
+                        }
+                        $r[$fk] = $arr;
+                    } else {
+                        // 特殊类型，需要迭代进去
+                        $arr = [];
+                        foreach ($val as $e) {
+                            $arr[] = self::Output($e);
+                        }
+                        $r[$fk] = $arr;
+                    }
+                } else if ($fp->map) {
+                    $m = [];
+                    if ($val) {
+                        if (in_array($fp->valtype, self::POD_TYPES)) {
+                            foreach ($val as $k => $v) {
+                                $m[$k] = $v;
+                            }
+                        } else {
+                            foreach ($val as $k => $v) {
+                                $m[$k] = self::Output($v);
+                            }
+                        }
+                    }
+                    $r[$fk] = $m;
+                } else if ($fp->enum) {
+                    $r[$fk] = (int)$val;
+                } else {
+                    $v = self::Output($val);
+                    if ($v == null)
+                        $v = ObjectT::ToObject($val);
+                    $r[$fk] = $v;
+                }
+            } else {
+                if ($fp->string)
+                    $r[$fk] = (string)$val;
+                else if ($fp->integer)
+                    $r[$fk] = (int)$val;
+                else if ($fp->double)
+                    $r[$fk] = (double)$val;
+                else if ($fp->boolean)
+                    $r[$fk] = !!$val;
+                else if ($fp->enum)
+                    $r[$fk] = (int)$val;
+                else {
+                    $v = self::Output($val);
+                    if ($v == null)
+                        $v = ObjectT::ToObject($val);
+                    $r[$fk] = $v;
+                }
+            }
+        }
+        // 输出内置的数据
+        if (isset($mdl["_mid"]))
+            $r["_mid"] = $mdl["_mid"];
+        return $r;
     }
 
     static function CheckInputStatus($clazz, $params): int
