@@ -299,8 +299,8 @@ class Proto
             }
         }
         // 输出内置的数据
-        if (isset($mdl["_mid"]))
-            $r["_mid"] = $mdl["_mid"];
+        if (isset($mdl->_mid))
+            $r["_mid"] = $mdl->_mid;
         return $r;
     }
 

@@ -78,7 +78,7 @@ class Routers
             }
         });
 
-        if (!isset($r->{$trans->call})) {
+        if (!method_exists($r, $trans->call)) {
             $trans->status = STATUS::ACTION_NOT_FOUND;
             $trans->submit();
             return;

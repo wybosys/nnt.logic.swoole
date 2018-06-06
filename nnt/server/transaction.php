@@ -168,6 +168,16 @@ abstract class Transaction
         if ($sta != STATUS::OK)
             return $sta;
 
+        // 填入数据到模型
+        $this->model = new $clz();
+        try {
+            Proto::Decode($this->model, $this->params);
+        } catch (\Throwable $err) {
+            $this->model = null;
+            Logger::Fatal($err->getMessage());
+            return STATUS::MODEL_ERROR;
+        }
+
         return STATUS::OK;
     }
 
@@ -180,7 +190,8 @@ abstract class Transaction
     // 验证
     function needAuth(): bool
     {
-        return false;
+        $mi = Proto::Get($this->model);
+        return $mi->auth;
     }
 
 }
