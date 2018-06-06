@@ -5,9 +5,13 @@ namespace Nnt\Server;
 use Nnt\Core\DateTime;
 use Nnt\Core\IRouter;
 use Nnt\Core\ObjectT;
+use Nnt\Core\Router;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
+
+// 避免与定义的基础模型找不到
+include_once DIR_NNT . '/core/models.php';
 
 abstract class Transaction
 {
@@ -15,6 +19,7 @@ abstract class Transaction
     {
         $this->time = DateTime::Now();
         $this->info = new TransactionInfo();
+        $this->waitTimeout();
     }
 
     // 返回事务用来区分客户端的id，通常业务中实现为sid
@@ -149,6 +154,7 @@ abstract class Transaction
 
     function modelize(IRouter $r): int
     {
+        $ri = Router::Get($r);
         return STATUS::OK;
     }
 

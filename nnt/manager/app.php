@@ -5,6 +5,8 @@ namespace Nnt\Manager;
 use Nnt\Core\Urls;
 use Nnt\Logger\Logger;
 
+define('DIR_NNT', dirname(__DIR__));
+
 class App
 {
     function __construct()
