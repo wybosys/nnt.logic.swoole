@@ -2,6 +2,8 @@
 
 namespace Nnt\Core;
 
+use Nnt\Logger\Logger;
+
 class FieldInfo
 {
     // 唯一序号，后续类似pb的协议会使用id来做数据版本兼容
@@ -18,7 +20,6 @@ class FieldInfo
     // 类型标签
     public $array;
     public $map;
-    public $multimap;
     public $string;
     public $integer;
     public $double;
@@ -55,6 +56,14 @@ class ModelInfo
 
     // 所有的数据项
     public $fields = [];
+
+    /**
+     * @return FieldInfo
+     */
+    function field($nm)
+    {
+        return @$this->fields[$nm];
+    }
 }
 
 function model($options, $parent): ModelInfo
@@ -119,15 +128,6 @@ function map_($id, $keytyp, $valtyp, $opts, $comment): FieldInfo
 {
     $ret = field_($id, $opts, $comment);
     $ret->map = true;
-    $ret->keytype = $keytyp;
-    $ret->valtype = $valtyp;
-    return $ret;
-}
-
-function multimap_($id, $keytyp, $valtyp, $opts, $comment): FieldInfo
-{
-    $ret = field_($id, $opts, $comment);
-    $ret->multimap = true;
     $ret->keytype = $keytyp;
     $ret->valtype = $valtyp;
     return $ret;
@@ -238,6 +238,131 @@ class Proto
 
     static function CheckInput($proto, $params): bool
     {
-        return true;
+        $sta = self::CheckInputStatus($proto, $params);
+        return $sta == STATUS::OK;
     }
+
+    const POD_TYPES = ['string', 'integer', 'double', 'boolean'];
+
+    static function DecodeValue(FieldInfo $fp, $val, $input = true, $output = false)
+    {
+        if ($fp->valtype) {
+            if ($fp->array) {
+                $arr = [];
+                if ($val) {
+                    if (in_array($fp->valtype, self::POD_TYPES)) {
+                        if (!(is_array($val))) {
+                            // 对于array，约定用，来分割
+                            $val = explode(",", $val);
+                        }
+                        if ($fp->valtype == "string") {
+                            foreach ($val as $e) {
+                                $arr[] = $e ? (string)$e : null;
+                            }
+                        } else if ($fp->valtype == "integer") {
+                            foreach ($val as $e) {
+                                $arr[] = (int)$e;
+                            }
+                        } else if ($fp->valtype == "double") {
+                            foreach ($val as $e) {
+                                $arr[] = (double)$e;
+                            }
+                        } else if ($fp->valtype == "boolean") {
+                            foreach ($val as $e) {
+                                $arr[] = !!$e;
+                            }
+                        }
+                    } else {
+                        if (is_string($val))
+                            $val = json_decode($val);
+                        if (is_array($val)) {
+                            $clz = $fp->valtype;
+                            foreach ($val as $e) {
+                                $t = new $clz();
+                                self::Decode($t, $e, $input, $output);
+                                $arr[] = $t;
+                            }
+                        } else {
+                            Logger::Log("Array遇到了错误的数据 $val");
+                        }
+                    }
+                }
+                return $arr;
+            } else if ($fp->map) {
+                $map = [];
+                if (in_array($fp->valtype, self::POD_TYPES)) {
+                    if ($fp->valtype == "string") {
+                        foreach ($val as $ek => $ev) {
+                            $map[$ek] = $ev ? (string)$ev : null;
+                        }
+                    } else if ($fp->valtype == "integer") {
+                        foreach ($val as $ek => $ev) {
+                            $map[$ek] = $ev ? (int)$ev : null;
+                        }
+                    } else if ($fp->valtype == "double") {
+                        foreach ($val as $ek => $ev) {
+                            $map[$ek] = $ev ? (double)$ev : null;
+                        }
+                    } else if ($fp->valtype == "boolean") {
+                        foreach ($val as $ek => $ev) {
+                            $map[$ek] = !!$ev;
+                        }
+                    }
+                } else {
+                    $clz = $fp->valtype;
+                    foreach ($val as $ek => $ev) {
+                        $t = new $clz();
+                        self::Decode($t, $ev, $input, $output);
+                        $map[$ek] = $t;
+                    }
+                }
+                return $map;
+            } else if ($fp->enum) {
+                return (int)$val;
+            } else {
+                if (!in_array($fp->valtype, self::POD_TYPES))
+                    $val = json_decode($val);
+                if ($fp->valtype == "object")
+                    return $val;
+                $clz = $fp->valtype;
+                $t = new $clz();
+                self::Decode($t, $val, $input, $output);
+                return $t;
+            }
+        } else {
+            if ($fp->string)
+                return $val ? (string)$val : null;
+            else if ($fp->integer)
+                return (int)$val;
+            else if ($fp->double)
+                return (double)$val;
+            else if ($fp->boolean)
+                return $val == "true";
+            else if ($fp->enum)
+                return (int)$val;
+            else if ($fp->json)
+                return json_decode($val);
+            else
+                return $val;
+        }
+    }
+
+    // 将数据从参数集写入到模型中的字段
+    static function Decode($mdl, $params, $input = true, $output = false)
+    {
+        $mi = self::Get($mdl);
+        if ($mi == null)
+            return;
+        foreach ($params as $key => $val) {
+            $fp = $mi->field($key);
+            if (!$fp)
+                continue;
+            if ($input && !$fp->input)
+                continue;
+            if ($output && !$fp->output)
+                continue;
+            $mdl[$key] = self::DecodeValue($fp, $val, $input, $output);
+        }
+    }
+
 }
