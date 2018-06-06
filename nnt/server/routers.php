@@ -41,7 +41,7 @@ class Routers
         }
 
         // 模型化
-        $sta = $trans->modelize(r);
+        $sta = $trans->modelize($r);
         if ($sta) {
             $trans->status = $sta;
             $trans->submit();
@@ -62,8 +62,8 @@ class Routers
                         return;
                     }
                 } else {
-                    $pass = go(function () use ($trans) {
-                        return $this->devopscheck($trans);
+                    go(function () use ($trans, &$pass) {
+                        $pass = $this->devopscheck($trans);
                     });
 
                     if (!$pass) {
@@ -74,6 +74,16 @@ class Routers
                 }
             }
         });
+
+        if (!isset($r->{$trans->call})) {
+            $trans->status = STATUS::ACTION_NOT_FOUND;
+            $trans->submit();
+            return;
+        }
+
+        // 不论同步或者异步模式，默认认为是成功的，业务逻辑如果出错则再次设置status为对应的错误码
+        $trans->status = STATUS::OK;
+        $r->{$trans->call}($trans);
     }
 
     // devops下的权限判断
