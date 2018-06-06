@@ -38,4 +38,14 @@ class Proto
     {
         return null;
     }
+
+    static function CheckInputStatus($proto, $params): int
+    {
+        return STATUS::OK;
+    }
+
+    static function CheckInput($proto, $params): bool
+    {
+        return true;
+    }
 }

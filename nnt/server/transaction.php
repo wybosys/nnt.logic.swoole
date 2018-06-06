@@ -155,6 +155,15 @@ abstract class Transaction
     function modelize(IRouter $r): int
     {
         $ri = Router::Get($r);
+        $ai = @$ri->find($r->action());
+        if (!$ai)
+            return STATUS::ACTION_NOT_FOUND;
+        $this->expose = $ai->expose;
+
+        $clz = $ai->clazz;
+
+        // 检查输入参数
+
         return STATUS::OK;
     }
 

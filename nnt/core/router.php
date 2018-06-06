@@ -38,6 +38,11 @@ class ActionInfo
 class RouterInfo
 {
     public $actions = [];
+
+    function find($name): ActionInfo
+    {
+        return @$this->actions[$name];
+    }
 }
 
 function action($clazz, $options = null, $comment = null): ActionInfo
@@ -90,7 +95,7 @@ class Router
             $res = null;
             eval("\$res = call_user_func('\Nnt\Core\action', '$matches[1]' $matches[2]);");
             $res->name = $method->name;
-            $ret->actions[] = $res;
+            $ret->actions[$res->name] = $res;
         }
         return $ret;
     }
