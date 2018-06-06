@@ -39,9 +39,12 @@ class RouterInfo
 {
     public $actions = [];
 
-    function find($name): ActionInfo
+    /**
+     * @return ActionInfo
+     */
+    function find($name)
     {
-        return @$this->actions[$name];
+        return ObjectT::Get($this->actions, $name);
     }
 }
 

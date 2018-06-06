@@ -32,9 +32,6 @@ class FieldInfo
 
     // 注释
     public $comment;
-
-    // 有效性检查函数
-    public $valid;
 }
 
 // 模型的原型信息
@@ -55,6 +52,113 @@ class ModelInfo
     // 父类，目前用来生成api里面的父类名称
     public $parent;
 
+    // 所有的数据项
+    public $fields = [];
+}
+
+function model($options, $parent): ModelInfo
+{
+    $ret = new ModelInfo();
+    $ret->auth = in_array('auth', $options);
+    $ret->enum = in_array('enumm', $options);
+    $ret->constant = in_array('constant', $options);
+    $ret->hidden = in_array('hidden', $options);
+    $ret->parent = $parent;
+    return $ret;
+}
+
+function field_($id, $opts, $comment): FieldInfo
+{
+    $ret = new FieldInfo();
+    $ret->id = $id;
+    $ret->input = in_array('input', $opts);
+    $ret->output = in_array('output', $opts);
+    $ret->optional = in_array('optional', $opts);
+    $ret->comment = $comment;
+    return $ret;
+}
+
+function string_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->string = true;
+    return $ret;
+}
+
+function boolean_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->boolean = true;
+    return $ret;
+}
+
+function integer_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->integer = true;
+    return $ret;
+}
+
+function double_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->double = true;
+    return $ret;
+}
+
+function array_($id, $clz, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->array = true;
+    $ret->valtype = $clz;
+    return $ret;
+}
+
+function map_($id, $keytyp, $valtyp, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->map = true;
+    $ret->keytype = $keytyp;
+    $ret->valtype = $valtyp;
+    return $ret;
+}
+
+function multimap_($id, $keytyp, $valtyp, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->multimap = true;
+    $ret->keytype = $keytyp;
+    $ret->valtype = $valtyp;
+    return $ret;
+}
+
+function json_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->json = true;
+    return $ret;
+}
+
+function type_($id, $clz, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->valtype = $clz;
+    return $ret;
+}
+
+function enumerate_($id, $clz, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->enum = true;
+    $ret->valtype = $clz;
+    return $ret;
+}
+
+function file_($id, $opts, $comment): FieldInfo
+{
+    $ret = field_($id, $opts, $comment);
+    $ret->file = true;
+    return $ret;
 }
 
 class Proto
@@ -68,7 +172,7 @@ class Proto
      */
     static function Get($obj): ModelInfo
     {
-        $clazz = get_class($obj);
+        $clazz = is_object($obj) ? get_class($obj) : $obj;
         if ($clazz === false)
             return null;
         if (isset(self::$_clazzes[$clazz]))
@@ -80,7 +184,24 @@ class Proto
 
     static function ParseClass($clazz): ModelInfo
     {
-        return null;
+        $reflect = new \ReflectionClass($clazz);
+        // 提取model的信息
+        $plain = $reflect->getDocComment();
+        if (!preg_match('/@model\((\[.*\])?[, ]*(.*)\)/', $plain, $matches))
+            return null;
+
+        $ret = null;
+        if (!$matches[1])
+            $matches[1] = '[]';
+        eval("\$ret = call_user_func('\Nnt\Core\model', $matches[1], '$matches[2]');");
+
+        $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
+        foreach ($methods as $fname => $finfo) {
+            $plain = $finfo->getDocComment();
+
+        }
+
+        return $ret;
     }
 
     static function Output($obj)
@@ -88,8 +209,15 @@ class Proto
         return null;
     }
 
-    static function CheckInputStatus($proto, $params): int
+    static function CheckInputStatus($clazz, $params): int
     {
+        $mi = self::Get($clazz);
+        if ($mi == null)
+            return STATUS::OK;
+        foreach ($mi->fields as $fnm => $finfo) {
+            if (!$finfo->input)
+                continue;
+        }
         return STATUS::OK;
     }
 

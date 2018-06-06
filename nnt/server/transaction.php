@@ -5,6 +5,7 @@ namespace Nnt\Server;
 use Nnt\Core\DateTime;
 use Nnt\Core\IRouter;
 use Nnt\Core\ObjectT;
+use Nnt\Core\Proto;
 use Nnt\Core\Router;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
@@ -155,7 +156,7 @@ abstract class Transaction
     function modelize(IRouter $r): int
     {
         $ri = Router::Get($r);
-        $ai = @$ri->find($r->action());
+        $ai = @$ri->find($this->call);
         if (!$ai)
             return STATUS::ACTION_NOT_FOUND;
         $this->expose = $ai->expose;
@@ -163,6 +164,9 @@ abstract class Transaction
         $clz = $ai->clazz;
 
         // 检查输入参数
+        $sta = Proto::CheckInputStatus($clz, $this->params);
+        if ($sta != STATUS::OK)
+            return $sta;
 
         return STATUS::OK;
     }
