@@ -3,9 +3,10 @@
 namespace Nnt\Server;
 
 use Nnt\Core\ClassT;
+use Nnt\Core\MapT;
 use Nnt\Logger\Logger;
 
-class Rest extends Server implements IRouterable, IHttpServer
+class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
 {
     function __construct()
     {
@@ -65,9 +66,41 @@ class Rest extends Server implements IRouterable, IHttpServer
     {
         $hdl = new \Swoole\Http\Server($this->listen ? $this->listen : "0.0.0.0", $this->port);
         $hdl->on('request', function (\Swoole\Http\Request $req, \Swoole\Http\Response $rsp) {
-            $rsp->end();
+            $this->doWorker($req, $rsp);
         });
         $hdl->start();
+    }
+
+    protected function doWorker(\Swoole\Http\Request $req, \Swoole\Http\Response $rsp)
+    {
+        // 打开跨域支持
+        $rsp->header("Access-Control-Allow-Origin", "*");
+        $rsp->header("Access-Control-Allow-Credentials", "true");
+        $rsp->header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+
+        // 直接对option进行成功响应
+        if ($req->server["request_method"] == "OPTIONS") {
+            if (isset($req->header["access-control-request-headers"]))
+                $rsp->header("Access-Control-Allow-Headers", $req->header["access-control-request-headers"]);
+            if (isset($req->header["access-control-request-method"]) && $req->header["access-control-request-method"] == "POST")
+                $rsp->header("Content-Type", "multipart/form-data");
+            $rsp->status(204);
+            $rsp->end();
+            return;
+        }
+
+        // 处理url请求
+        Logger::Log($req->server["request_uri"] . "?" . $req->server["query_string"]);
+
+        // 合并post、get请求
+        $params = MapT::Merge($req->get, $req->post, $req->files);
+
+        $this->invoke($params, $req, $rsp);
+    }
+
+    function invoke($params, $req, $rsp)
+    {
+        
     }
 
     protected $_routers;

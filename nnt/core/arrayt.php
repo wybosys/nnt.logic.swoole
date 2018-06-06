@@ -4,7 +4,6 @@ namespace Nnt\Core;
 
 class ArrayT
 {
-
     /**
      * @param $arr array
      * @param $filter ($each, $index)
