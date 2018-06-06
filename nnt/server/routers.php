@@ -3,8 +3,11 @@
 namespace Nnt\Server;
 
 use Nnt\Core\IRouter;
+use Nnt\Core\ObjectT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
+use Nnt\Manager\Config;
+use Nnt\Server\Devops\Permissions;
 
 class Routers
 {
@@ -89,6 +92,31 @@ class Routers
     // devops下的权限判断
     protected function devopscheck(Transaction $trans)
     {
-        return false;
+        // devops环境下才进行权限判定
+        if (Config::$LOCAL)
+            return true;
+
+        // 允许客户端访的将无法进行服务端权限判定
+        if (Config::$CLIENT_ALLOW)
+            return true;
+
+        // 如果访问的是api.doc，则不进行判定
+        if ($trans->action() == 'api.doc')
+            return true;
+
+        // 和php等一样的规则
+        if (Config::$DEVOPS_DEVELOP) {
+            $skip = ObjectT::Get($trans->params, Permissions::KEY_SKIPPERMISSION);
+            if ($skip)
+                return true;
+        }
+
+        $permid = ObjectT::Get($trans->params, Permissions::KEY_PERMISSIONID);
+        if (!$permid) {
+            Logger::Warn("调用接口没有传递 permissionid");
+            return false;
+        }
+
+        return true;
     }
 }
