@@ -3,6 +3,7 @@
 namespace Nnt\Server;
 
 use Nnt\Core\IRouter;
+use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 
 class Routers
@@ -31,5 +32,53 @@ class Routers
 
     function process(Transaction $trans)
     {
+        // 查找router
+        $r = $this->find($trans->router);
+        if ($r == null) {
+            $trans->status = STATUS::ROUTER_NOT_FOUND;
+            $trans->submit();
+            return;
+        }
+
+        // 模型化
+        $sta = $trans->modelize(r);
+        if ($sta) {
+            $trans->status = $sta;
+            $trans->submit();
+            return;
+        }
+
+        // 恢复数据上下文
+        go(function () use ($trans) {
+            $trans->collect();
+
+            // 不做权限判断
+            if (!$trans->expose) {
+                // 访问权限判断
+                if ($trans->needAuth()) {
+                    if (!$trans->auth()) {
+                        $trans->status = STATUS::NEED_AUTH;
+                        $trans->submit();
+                        return;
+                    }
+                } else {
+                    $pass = go(function () use ($trans) {
+                        return $this->devopscheck($trans);
+                    });
+
+                    if (!$pass) {
+                        $trans->status = STATUS::PERMISSIO_FAILED;
+                        $trans->submit();
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    // devops下的权限判断
+    protected function devopscheck(Transaction $trans)
+    {
+        return false;
     }
 }

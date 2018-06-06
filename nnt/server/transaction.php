@@ -3,6 +3,7 @@
 namespace Nnt\Server;
 
 use Nnt\Core\DateTime;
+use Nnt\Core\IRouter;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
@@ -144,6 +145,24 @@ abstract class Transaction
 
     // 是否把sid返回客户端
     public $responseSessionId = false;
+
+    function modelize(IRouter $r): int
+    {
+        return STATUS::OK;
+    }
+
+    // 恢复上下文，涉及到数据的恢复，所以是异步模式
+    function collect()
+    {
+
+    }
+
+    // 验证
+    function needAuth(): bool
+    {
+        return false;
+    }
+
 }
 
 class EmptyTransaction extends Transaction
