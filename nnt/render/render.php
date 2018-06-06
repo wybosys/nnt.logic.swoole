@@ -10,7 +10,7 @@ interface IRender
 {
     function type(): string;
 
-    function render(Transaction $t, TransactionSubmitOption $opt): string;
+    function render(Transaction $t, TransactionSubmitOption $opt = null): string;
 }
 
 class Render

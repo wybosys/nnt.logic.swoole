@@ -12,7 +12,7 @@ class Json implements IRender
         return "application/json";
     }
 
-    public function render(Transaction $t, TransactionSubmitOption $opt): string
+    public function render(Transaction $t, TransactionSubmitOption $opt = null): string
     {
         return "";
     }

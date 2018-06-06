@@ -12,7 +12,7 @@ class Raw implements IRender
         return 'text/plain';
     }
 
-    public function render(Transaction $t, TransactionSubmitOption $opt): string
+    public function render(Transaction $t, TransactionSubmitOption $opt = null): string
     {
         return (string)$t->model;
     }

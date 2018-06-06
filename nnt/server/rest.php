@@ -127,7 +127,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
                 else
                     $t->info->agent = $req->header["user-agent"];
                 $t->info->host = $req->header["host"];
-                $t->info->addr = $req->server["remove_addr"];
+                $t->info->addr = $req->server["remote_addr"];
                 $t->info->path = $req->server["path_info"];
             }
 
@@ -137,7 +137,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         } catch (\Throwable $err) {
             Logger::Exception($err);
             $t->status = STATUS::EXCEPTION;
-            t . submit();
+            $t->submit();
         }
     }
 
@@ -159,14 +159,16 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     protected function doInvoke(Transaction $t, $params, \Swoole\Http\Request $req, \Swoole\Http\Response $rsp)
     {
         $t->payload = new RestTransactionPayload($req, $rsp);
-        $t->implSubmit = "TransactionSubmit";
+        $t->implSubmit = function ($t, $opt) {
+            TransactionSubmit($t, $opt);
+        };
         $this->_routers->process($t);
     }
 }
 
 const RESPONSE_SID = "X-NntLogic-SessionId";
 
-function TransactionSubmit(Transaction $t, TransactionSubmitOption $opt)
+function TransactionSubmit(Transaction $t, TransactionSubmitOption $opt = null)
 {
     $pl = $t->payload;
     $render = Render::Find(isset($t->params["render"]) ? $t->params["render"] : "json");

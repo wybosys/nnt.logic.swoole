@@ -165,25 +165,6 @@ abstract class Transaction
 
 }
 
-class EmptyTransaction extends Transaction
-{
-
-    function waitTimeout()
-    {
-        // pass
-    }
-
-    function sessionId(): string
-    {
-        return null;
-    }
-
-    function auth(): bool
-    {
-        return false;
-    }
-}
-
 class TransactionInfo
 {
     // 客户端
