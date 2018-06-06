@@ -40,6 +40,21 @@ class RouterInfo
     public $actions = [];
 }
 
+function action($clazz, $options = null, $comment = null): ActionInfo
+{
+    $ret = new ActionInfo();
+    $ret->clazz = $clazz;
+    $ret->debug = in_array('debug', $options);
+    $ret->develop = in_array('develop', $options);
+    $ret->local = in_array('local', $options);
+    $ret->devops = in_array('devops', $options);
+    $ret->devopsdevelop = in_array('devopsdevelop', $options);
+    $ret->devopsrelease = in_array('devopsrelease', $options);
+    $ret->expose = in_array('expose', $options);
+    $ret->comment = $comment;
+    return $ret;
+}
+
 class Router
 {
     private static $_clazzes = [];
@@ -63,9 +78,20 @@ class Router
 
     static function ParseClass($clazz): RouterInfo
     {
+        $ret = new RouterInfo();
         $reflect = new \ReflectionClass($clazz);
         $methods = $reflect->getMethods(\ReflectionMethod::IS_PUBLIC);
-
-        return null;
+        foreach ($methods as $method) {
+            $plain = $method->getDocComment();
+            // 处理action开头的注释
+            if (!preg_match('/@action\(([a-zA-Z\\\\]+)(.*)\)/', $plain, $matches))
+                continue;
+            // 直接执行注释函数
+            $res = null;
+            eval("\$res = call_user_func('\Nnt\Core\action', '$matches[1]' $matches[2]);");
+            $res->name = $method->name;
+            $ret->actions[] = $res;
+        }
+        return $ret;
     }
 }
