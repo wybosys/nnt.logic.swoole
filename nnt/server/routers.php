@@ -28,4 +28,8 @@ class Routers
     {
         return isset($this->_routers[$id]) ? $this->_routers[$id] : null;
     }
+
+    function process(Transaction $trans)
+    {
+    }
 }

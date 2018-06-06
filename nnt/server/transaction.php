@@ -139,8 +139,11 @@ abstract class Transaction
                 Logger::Exception($err);
             }
         }
-        ($this->implSubmit)($opt);
+        ($this->implSubmit)($this, $opt);
     }
+
+    // 是否把sid返回客户端
+    public $responseSessionId = false;
 }
 
 class EmptyTransaction extends Transaction

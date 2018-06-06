@@ -6,6 +6,7 @@ use Nnt\Core\ClassT;
 use Nnt\Core\MapT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
+use Nnt\Render\Render;
 
 class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
 {
@@ -157,5 +158,40 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
 
     protected function doInvoke(Transaction $t, $params, \Swoole\Http\Request $req, \Swoole\Http\Response $rsp)
     {
+        $t->payload = new RestTransactionPayload($req, $rsp);
+        $t->implSubmit = "TransactionSubmit";
+        $this->_routers->process($t);
     }
+}
+
+const RESPONSE_SID = "X-NntLogic-SessionId";
+
+function TransactionSubmit(Transaction $t, TransactionSubmitOption $opt)
+{
+    $pl = $t->payload;
+    $render = Render::Find(isset($t->params["render"]) ? $t->params["render"] : "json");
+    if ($t->responseSessionId)
+        $pl->rsp->header(RESPONSE_SID, $t->sessionId());
+    $pl->rsp->status(200);
+    $pl->rsp->header("Content-Type", ($opt && $opt->type) ? $opt->type : $render->type());
+    $pl->rsp->end($render->render($t, $opt));
+}
+
+class RestTransactionPayload
+{
+    function __construct(\Swoole\Http\Request $req, \Swoole\Http\Response $rsp)
+    {
+        $this->req = $req;
+        $this->rsp = $rsp;
+    }
+
+    /**
+     * @var \Swoole\Http\Request
+     */
+    public $req;
+
+    /**
+     * @var \Swoole\Http\Response
+     */
+    public $rsp;
 }
