@@ -4,12 +4,15 @@ namespace Nnt\Server;
 
 use Nnt\Core\DateTime;
 use Nnt\Core\STATUS;
+use Nnt\Logger\Logger;
+use Nnt\Manager\Config;
 
 abstract class Transaction
 {
     function __construct()
     {
         $this->time = DateTime::Now();
+        $this->info = new TransactionInfo();
     }
 
     // 返回事务用来区分客户端的id，通常业务中实现为sid
@@ -70,19 +73,120 @@ abstract class Transaction
     public $time;
 
     // 是否已经授权
-    abstract function auth(): boolean;
+    abstract function auth(): bool;
+
+    /**
+     * 环境信息
+     * @var TransactionInfo
+     */
+    public $info;
+
+    // 同步模式会自动提交，异步模式需要手动提交
+    public $implSubmit;
+    private $_submited;
+    private $_submited_timeout;
+    private $_timeout;
+
+    protected function waitTimeout()
+    {
+        $this->_timeout = swoole_timer_after(Config::$TRANSACTION_TIMEOUT * 1000, function () {
+            $this->_cbTimeout();
+        });
+    }
+
+    private function _cbTimeout()
+    {
+        Logger::Warn("$this->_action 超时");
+        $this->status = STATUS::TIMEOUT;
+        $this->submit();
+    }
+
+    // 部分api本来时间就很长，所以存在自定义timeout的需求
+    function timeout($seconds)
+    {
+        if ($this->_timeout) {
+            swoole_timer_clear($this->_timeout);
+            $this->_timeout = null;
+        }
+        if ($seconds == -1)
+            return;
+        $this->_timeout = swoole_timer_after($seconds * 1000, function () {
+            $this->_cbTimeout();
+        });
+    }
+
+    // 当提交的时候修改
+    public $hookSubmit;
+
+    function submit(TransactionSubmitOption $opt = null)
+    {
+        if ($this->_submited) {
+            if (!$this->_submited_timeout)
+                Logger::Warn("数据已经发送");
+            return;
+        }
+        if ($this->_timeout) {
+            swoole_timer_clear($this->_timeout);
+            $this->_timeout = null;
+            $this->_submited_timeout = true;
+        }
+        $this->_submited = true;
+        $this->_outputed = true;
+        if ($this->hookSubmit) {
+            try {
+                ($this->hookSubmit)();
+            } catch (\Throwable $err) {
+                Logger::Exception($err);
+            }
+        }
+        ($this->implSubmit)($opt);
+    }
 }
 
 class EmptyTransaction extends Transaction
 {
+
+    function waitTimeout()
+    {
+        // pass
+    }
 
     function sessionId(): string
     {
         return null;
     }
 
-    function auth(): boolean
+    function auth(): bool
     {
         return false;
     }
+}
+
+class TransactionInfo
+{
+    // 客户端
+    public $agent;
+
+    // 访问的主机
+    public $host;
+    public $origin;
+
+    // 客户端的地址
+    public $addr;
+
+    // 来源
+    public $referer;
+    public $path;
+}
+
+class TransactionSubmitOption
+{
+    // 仅输出模型
+    public $model;
+
+    // 直接输出数据
+    public $raw;
+
+    // 输出的类型
+    public $type;
 }

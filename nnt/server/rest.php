@@ -4,6 +4,7 @@ namespace Nnt\Server;
 
 use Nnt\Core\ClassT;
 use Nnt\Core\MapT;
+use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 
 class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
@@ -98,9 +99,45 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         $this->invoke($params, $req, $rsp);
     }
 
+    /**
+     * @param $params
+     * @param $req \Swoole\Http\Request
+     * @param $rsp \Swoole\Http\Response
+     */
     function invoke($params, $req, $rsp)
     {
-        
+        if (!isset($params["action"])) {
+            $rsp->status(400);
+            $rsp->end();
+            return;
+        }
+
+        $action = $params["action"];
+        $t = $this->instanceTransaction();
+        try {
+            $t->server = $this;
+            $t->action = $action;
+            $t->params = $params;
+
+            // 从请求中保存下信息
+            if ($req) {
+                if (isset($params["_agent"]))
+                    $t->info->agent = $params["_agent"];
+                else
+                    $t->info->agent = $req->header["user-agent"];
+                $t->info->host = $req->header["host"];
+                $t->info->addr = $req->server["remove_addr"];
+                $t->info->path = $req->server["path_info"];
+            }
+
+            $this->onBeforeInvoke($t);
+            $this->doInvoke($t, $params, $req, $rsp);
+            $this->onAfterInvoke($t);
+        } catch (\Throwable $err) {
+            Logger::Exception($err);
+            $t->status = STATUS::EXCEPTION;
+            t . submit();
+        }
     }
 
     protected $_routers;
@@ -108,5 +145,17 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     function routers(): Routers
     {
         return $this->_routers;
+    }
+
+    protected function onBeforeInvoke(Transaction $trans)
+    {
+    }
+
+    protected function onAfterInvoke(Transaction $trans)
+    {
+    }
+
+    protected function doInvoke(Transaction $t, $params, \Swoole\Http\Request $req, \Swoole\Http\Response $rsp)
+    {
     }
 }
