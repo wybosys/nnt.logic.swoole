@@ -5,8 +5,10 @@ spl_autoload_register(function ($classname) {
     // 文件、路径均为小写
     $classname = str_replace('\\', '/', strtolower($classname));
     $target = __DIR__ . "/$classname.php";
-    if (!is_file($target))
+    if (!is_file($target)) {
+        echo "没有找到类文件 $target";
         return false;
+    }
     include_once $target;
     return true;
 });

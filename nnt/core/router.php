@@ -68,13 +68,15 @@ function action($clazz, $options = null, $comment = null): ActionInfo
 {
     $ret = new ActionInfo();
     $ret->clazz = $clazz;
-    $ret->debug = in_array('debug', $options);
-    $ret->develop = in_array('develop', $options);
-    $ret->local = in_array('local', $options);
-    $ret->devops = in_array('devops', $options);
-    $ret->devopsdevelop = in_array('devopsdevelop', $options);
-    $ret->devopsrelease = in_array('devopsrelease', $options);
-    $ret->expose = in_array('expose', $options);
+    if ($options) {
+        $ret->debug = in_array('debug', $options);
+        $ret->develop = in_array('develop', $options);
+        $ret->local = in_array('local', $options);
+        $ret->devops = in_array('devops', $options);
+        $ret->devopsdevelop = in_array('devopsdevelop', $options);
+        $ret->devopsrelease = in_array('devopsrelease', $options);
+        $ret->expose = in_array('expose', $options);
+    }
     $ret->comment = $comment;
     return $ret;
 }

@@ -37,7 +37,7 @@ class RSample implements IRouter
     }
 
     /**
-     * @action(Echoo)
+     * @action(\App\Echoo)
      */
     function echo(Transaction $trans, Echoo $m)
     {
