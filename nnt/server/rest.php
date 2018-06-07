@@ -3,6 +3,7 @@
 namespace Nnt\Server;
 
 use Nnt\Core\ClassT;
+use Nnt\Core\DateTime;
 use Nnt\Core\MapT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
@@ -188,38 +189,35 @@ function TransactionOutput(Transaction $t, string $type, $obj)
     $pl->rsp->header("Content-Type", $type);
     if ($t->gzip)
         $pl->rsp->header("Content-Encoding", "gzip");
-    if (obj instanceof RespFile) {
-        ct["Content-Length"] = obj . length;
-        if (obj . cachable) {
+    if ($obj instanceof RespFile) {
+        $pl->rsp->header("Content-Length", (string)$obj->length());
+        if ($obj->cachable()) {
             // 只有文件对象才可以增加过期控制
-            if (pl . req . headers["if-modified-since"]) {
+            if (@$pl->req->header["if-modified-since"]) {
                 // 判断下请求的文件有没有改变
-                if (obj . stat . mtime . toUTCString() == pl . req . headers["if-modified-since"]) {
-                    pl . rsp . writeHead(304, "Not Modified");
-                    pl . rsp . end();
+                if ($obj->stat('mtime') == $pl->req->header["if-modified-since"]) {
+                    $pl->rsp->status(304);
+                    $pl->rsp->end("Not Modified");
                     return;
                 }
             }
-            ct["Expires"] = obj . expire . toUTCString();
-            ct["Cache-Control"] = "max-age=" + DateTime . WEEK;
-            ct["Last-Modified"] = obj . stat . mtime . toUTCString();
+            $pl->rsp->header("Expires", $obj->expire());
+            $pl->rsp->header("Cache-Control", "max-age=" . DateTime::WEEK);
+            $pl->rsp->header("Last-Modified", $obj->stat('mtime'));
         }
         // 如果是提供下载
-        if (obj . download) {
-            pl . rsp . setHeader('Accept-Ranges', 'bytes');
-            pl . rsp . setHeader('Accept-Length', obj . length);
-            pl . rsp . setHeader('Content-Disposition', 'attachment; filename=' + obj . file);
-            pl . rsp . setHeader('Content-Description', "File Transfer");
-            pl . rsp . setHeader('Content-Transfer-Encoding', 'binary');
+        if ($obj->download()) {
+            $pl->rsp->header('Accept-Ranges', 'bytes');
+            $pl->rsp->header('Accept-Length', $obj->length());
+            $pl->rsp->header('Content-Disposition', 'attachment; filename=' . $obj->file());
+            $pl->rsp->header('Content-Description', "File Transfer");
+            $pl->rsp->header('Content-Transfer-Encoding', 'binary');
         }
-        pl . rsp . writeHead(200, ct);
-        obj . readStream . pipe(pl . rsp);
-    } else if (obj instanceof Stream) {
-        pl . rsp . writeHead(200, ct);
-        obj . pipe(pl . rsp);
+        $pl->rsp->status(200);
+        $pl->rsp->sendfile($obj->file());
     } else {
-        pl . rsp . writeHead(200, ct);
-        pl . rsp . end(obj);
+        $pl->rsp->status(200);
+        $pl->rsp->end((string)$obj);
     }
 }
 

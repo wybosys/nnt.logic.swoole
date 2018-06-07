@@ -57,9 +57,11 @@ class RespFile
         return null;
     }
 
-    function stat()
+    function stat($key = null)
     {
-        return $this->_stat;
+        if ($key == null)
+            return $this->_stat;
+        return @$this->_stat[$key];
     }
 
     function cachable(): bool
