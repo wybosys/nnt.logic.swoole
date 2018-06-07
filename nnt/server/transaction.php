@@ -74,6 +74,9 @@ abstract class Transaction
     // 基于哪个服务器运行
     public $server;
 
+    // 是否是压缩数据
+    public $gzip;
+
     // 是否暴露接口（通常只有登录会设置为true)
     public $expose;
 
@@ -126,6 +129,10 @@ abstract class Transaction
     // 当提交的时候修改
     public $hookSubmit;
 
+    // 输出文件
+    public $implOutput;
+    private $_outputed;
+
     function submit(TransactionSubmitOption $opt = null)
     {
         if ($this->_submited) {
@@ -150,7 +157,22 @@ abstract class Transaction
         ($this->implSubmit)($this, $opt);
     }
 
-    // 是否把sid返回客户端
+    function output(string $type, $obj)
+    {
+        if ($this->_outputed) {
+            Logger::Warn("api已经发送");
+            return;
+        }
+        if ($this->_timeout) {
+            swoole_timer_clear($this->_timeout);
+            $this->_timeout = null;
+        }
+        $this->_outputed = true;
+        $this->_submited = true;
+        ($this->implOutput)($this, $type, $obj);
+    }
+
+// 是否把sid返回客户端
     public $responseSessionId = false;
 
     function modelize(IRouter $r): int

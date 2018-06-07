@@ -162,6 +162,9 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         $t->implSubmit = function ($t, $opt) {
             TransactionSubmit($t, $opt);
         };
+        $t->implOutput = function ($t, $type, $obj) {
+            TransactionOutput($t, $type, $obj);
+        };
         $this->_routers->process($t);
     }
 }
@@ -177,6 +180,47 @@ function TransactionSubmit(Transaction $t, TransactionSubmitOption $opt = null)
     $pl->rsp->status(200);
     $pl->rsp->header("Content-Type", ($opt && $opt->type) ? $opt->type : $render->type());
     $pl->rsp->end($render->render($t, $opt));
+}
+
+function TransactionOutput(Transaction $t, string $type, $obj)
+{
+    $pl = $t->payload;
+    $pl->rsp->header("Content-Type", $type);
+    if ($t->gzip)
+        $pl->rsp->header("Content-Encoding", "gzip");
+    if (obj instanceof RespFile) {
+        ct["Content-Length"] = obj . length;
+        if (obj . cachable) {
+            // 只有文件对象才可以增加过期控制
+            if (pl . req . headers["if-modified-since"]) {
+                // 判断下请求的文件有没有改变
+                if (obj . stat . mtime . toUTCString() == pl . req . headers["if-modified-since"]) {
+                    pl . rsp . writeHead(304, "Not Modified");
+                    pl . rsp . end();
+                    return;
+                }
+            }
+            ct["Expires"] = obj . expire . toUTCString();
+            ct["Cache-Control"] = "max-age=" + DateTime . WEEK;
+            ct["Last-Modified"] = obj . stat . mtime . toUTCString();
+        }
+        // 如果是提供下载
+        if (obj . download) {
+            pl . rsp . setHeader('Accept-Ranges', 'bytes');
+            pl . rsp . setHeader('Accept-Length', obj . length);
+            pl . rsp . setHeader('Content-Disposition', 'attachment; filename=' + obj . file);
+            pl . rsp . setHeader('Content-Description', "File Transfer");
+            pl . rsp . setHeader('Content-Transfer-Encoding', 'binary');
+        }
+        pl . rsp . writeHead(200, ct);
+        obj . readStream . pipe(pl . rsp);
+    } else if (obj instanceof Stream) {
+        pl . rsp . writeHead(200, ct);
+        obj . pipe(pl . rsp);
+    } else {
+        pl . rsp . writeHead(200, ct);
+        pl . rsp . end(obj);
+    }
 }
 
 class RestTransactionPayload
