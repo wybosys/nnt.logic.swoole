@@ -9,7 +9,7 @@ class ArrayT
      * @param $filter ($each, $index)
      * @return object
      */
-    static function QueryObject($arr, callable $filter)
+    static function QueryObject(array $arr, callable $filter)
     {
         if ($arr) {
             for ($i = 0, $l = count($arr); $i < $l; ++$i) {
@@ -21,7 +21,7 @@ class ArrayT
         return null;
     }
 
-    static function Convert($arr, callable $to, $skipnull = false)
+    static function Convert(array $arr, callable $to, $skipnull = false)
     {
         $ret = [];
         if ($arr) {
@@ -40,7 +40,7 @@ class ArrayT
      * 将异步的foreach转换成等待同步操作
      * @param proc (each, idx, next)
      */
-    static function ForeachSync($arr, callable $proc)
+    static function ForeachSync(array $arr, callable $proc)
     {
         $i = 0;
         $l = count($arr);
@@ -50,5 +50,14 @@ class ArrayT
             $proc($arr[$i], $i++, $func);
         };
         $func();
+    }
+
+    static function PushObjects(array $arr, array $r)
+    {
+        if ($r) {
+            foreach ($r as $e) {
+                $arr[] = $e;
+            }
+        }
     }
 }

@@ -46,6 +46,22 @@ class RouterInfo
     {
         return ObjectT::Get($this->actions, $name);
     }
+
+    /**
+     * @return array string
+     */
+    function names()
+    {
+        return array_keys($this->actions);
+    }
+
+    /**
+     * #return array ActionInfo
+     */
+    function infos()
+    {
+        return array_values($this->actions);
+    }
 }
 
 function action($clazz, $options = null, $comment = null): ActionInfo

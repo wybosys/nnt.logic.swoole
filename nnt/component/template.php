@@ -2,7 +2,7 @@
 
 namespace Nnt\Component;
 
-const RE_PARAMETER = '/\{\{([a-zA-Z0-9_.]+)\}\}/g';
+const RE_PARAMETER = '/\{\{([a-zA-Z0-9_.]+)\}\}/';
 
 class Template
 {

@@ -33,6 +33,13 @@ class Routers
         return ObjectT::Get($this->_routers, $id);
     }
 
+    function foreach(callable $proc)
+    {
+        foreach ($this->_routers as $k => $v) {
+            $proc($v, $k);
+        }
+    }
+
     function process(Transaction $trans)
     {
         // 查找router
