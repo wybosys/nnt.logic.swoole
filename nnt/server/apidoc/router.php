@@ -98,7 +98,7 @@ class Router implements IRouter
     }
 
     /**
-     * @action(ExportApis, [], "生成api接口文件")
+     * @action(\Nnt\Server\Apidoc\ExportApis, [], "生成api接口文件")
      */
     function export(Transaction $trans)
     {
@@ -154,7 +154,7 @@ class Router implements IRouter
         return MapT::Convert($fps, function ($fp, $name) {
             $t = new ParameterInfo();
             $t->name = $name;
-            $t->array = $$fp->array;
+            $t->array = $fp->array;
             $t->string = $fp->string;
             $t->integer = $fp->integer;
             $t->double = $fp->double;

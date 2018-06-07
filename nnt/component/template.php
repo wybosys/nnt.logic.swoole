@@ -25,7 +25,7 @@ class Template
     {
         $str = $this->_buf;
         foreach ($parameters as $k => $e) {
-            $str = str_replace("@@__" + k, $e, $str);
+            $str = str_replace("@@__$k", $e, $str);
         }
         return $str;
     }

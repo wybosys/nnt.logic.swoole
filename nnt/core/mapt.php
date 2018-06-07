@@ -4,7 +4,7 @@ namespace Nnt\Core;
 
 class MapT
 {
-    static function Merge(...$arrs)
+    static function Merge(... $arrs)
     {
         $ret = [];
         foreach ($arrs as $arr) {

@@ -52,7 +52,7 @@ class ArrayT
         $func();
     }
 
-    static function PushObjects(array $arr, array $r)
+    static function PushObjects(array &$arr, array $r)
     {
         if ($r) {
             foreach ($r as $e) {
