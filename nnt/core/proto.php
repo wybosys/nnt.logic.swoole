@@ -227,9 +227,9 @@ namespace Nnt\Core {
                 return null;
             $r = [];
             foreach ($mi->fields as $fk => $fp) {
-                if (!$fp->output || !isset($mdl[$fk])) // 不能和客户端一样删除掉对fk的判断，服务端会使用model直接扔到数据库中查询，去掉后会生成初始值查询字段
+                if (!$fp->output || !isset($mdl->{$fk})) // 不能和客户端一样删除掉对fk的判断，服务端会使用model直接扔到数据库中查询，去掉后会生成初始值查询字段
                     continue;
-                $val = $mdl[$fk];
+                $val = $mdl->{$fk};
                 if ($fp->valtype) {
                     if ($fp->array) {
                         // 通用类型，则直接可以输出
@@ -450,7 +450,7 @@ namespace Nnt\Core {
                     continue;
                 if ($output && !$fp->output)
                     continue;
-                $mdl[$key] = self::DecodeValue($fp, $val, $input, $output);
+                $mdl->{$key} = self::DecodeValue($fp, $val, $input, $output);
             }
         }
 

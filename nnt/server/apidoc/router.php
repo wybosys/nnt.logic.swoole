@@ -5,7 +5,6 @@ namespace Nnt\Server\Apidoc;
 use Nnt\Component\Template;
 use Nnt\Core\ArrayT;
 use Nnt\Core\IRouter;
-use Nnt\Core\MapT;
 use Nnt\Core\Proto;
 use Nnt\Core\Urls;
 use Nnt\Server\Routers;
@@ -151,9 +150,9 @@ class Router implements IRouter
     {
         $mi = Proto::Get($clz);
         $fps = array_values($mi->fields);
-        return MapT::Convert($fps, function ($fp, $name) {
+        return ArrayT::Convert($fps, function ($fp) {
             $t = new ParameterInfo();
-            $t->name = $name;
+            $t->name = $fp->name;
             $t->array = $fp->array;
             $t->string = $fp->string;
             $t->integer = $fp->integer;

@@ -28,8 +28,8 @@ class Json implements IRender
                 "code" => $t->status,
                 "data" => ($opt && $opt->raw) ? $t->model : Proto::Output($t->model)
             ];
-            if ($t->model && $r->data === null)
-                $r->data = [];
+            if ($t->model && $r['data'] === null)
+                $r['data'] = [];
         }
         $cmid = ObjectT::Get($t->params, "_cmid");
         if ($cmid != null)

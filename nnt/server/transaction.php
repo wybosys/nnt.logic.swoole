@@ -172,7 +172,7 @@ abstract class Transaction
         ($this->implOutput)($this, $type, $obj);
     }
 
-// 是否把sid返回客户端
+    // 是否把sid返回客户端
     public $responseSessionId = false;
 
     function modelize(IRouter $r): int
