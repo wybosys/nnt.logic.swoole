@@ -84,9 +84,10 @@ class Routers
             return;
         }
 
+        // 和nodejs不同，php为了type hinting，额外提供对 func(Trans $t, Type $m) 形式的支持
         // 不论同步或者异步模式，默认认为是成功的，业务逻辑如果出错则再次设置status为对应的错误码
         $trans->status = STATUS::OK;
-        $r->{$trans->call}($trans);
+        $r->{$trans->call}($trans, $trans->model);
     }
 
     // devops下的权限判断

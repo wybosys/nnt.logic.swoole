@@ -39,9 +39,8 @@ class RSample implements IRouter
     /**
      * @action(Echoo)
      */
-    function echo(Transaction $trans)
+    function echo(Transaction $trans, Echoo $m)
     {
-        $m = $trans->model;
         $m->output = $m->input;
         $m->time = DateTime::Current();
         $trans->submit();
