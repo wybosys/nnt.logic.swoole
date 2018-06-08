@@ -216,7 +216,7 @@ namespace Nnt\Store {
         const POD_TYPES = ['string', 'integer', 'double', 'boolean'];
 
         // 填数据库对象
-        function Decode($mdl, $params)
+        static function Decode($mdl, $params)
         {
             $ti = self::Get($mdl);
             if ($ti == null)
@@ -281,7 +281,7 @@ namespace Nnt\Store {
             }
         }
 
-        function Output($mdl, $def = [])
+        static function Output($mdl, $def = [])
         {
             if (!$mdl)
                 return $def;

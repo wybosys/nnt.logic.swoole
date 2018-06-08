@@ -23,4 +23,11 @@ class ObjectT
         return $obj;
     }
 
+    // 框架中约定所有类均位于名域之中
+    static function IsClass($obj): bool
+    {
+        if (!is_string($obj))
+            return false;
+        return strpos('\\', $obj) != false;
+    }
 }

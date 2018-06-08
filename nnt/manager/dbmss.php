@@ -3,6 +3,7 @@
 namespace Nnt\Manager;
 
 use Nnt\Core\ClassT;
+use Nnt\Store\Dbms;
 
 class Dbmss
 {
@@ -27,4 +28,10 @@ class Dbmss
             }
         }
     }
+
+    static function Find(string $id): Dbms
+    {
+        return @self::$_dbs[id];
+    }
+
 }
