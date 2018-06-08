@@ -111,27 +111,32 @@ class Transaction
 
     function run()
     {
-        if (!$this->_db)
-            return null;
+        $db = $this->_db->pool();
+        $this->doRun($db);
+        $db->repool();
+    }
+
+    protected function doRun($db)
+    {
         try {
             if ($this->_rdb) {
                 if ($this->rdbproc)
-                    return ($this->rdbproc)();
+                    return ($this->rdbproc)($db);
                 else
                     return null;
             } else if ($this->_nosql) {
                 if ($this->nosqlproc)
-                    return ($this->nosqlproc)();
+                    return ($this->nosqlproc)($db);
                 else
                     return null;
             } else if ($this->_kv) {
                 if ($this->kvproc)
-                    return ($this->kvproc)();
+                    return ($this->kvproc)($db);
                 else
                     return null;
             } else if ($this->_db) {
                 if ($this->dbproc)
-                    return ($this->dbproc)();
+                    return ($this->dbproc)($db);
                 else
                     return null;
             } else {
