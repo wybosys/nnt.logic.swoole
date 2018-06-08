@@ -65,7 +65,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     public $router;
     protected $_hdl;
 
-    function start(callable $cb)
+    function start()
     {
         $this->hdl = new \Swoole\Http\Server($this->listen ? $this->listen : "0.0.0.0", $this->port);
 
@@ -75,6 +75,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         });
 
         $this->hdl->start();
+        parent::start();
     }
 
     protected function doWorker(\Swoole\Http\Request $req, \Swoole\Http\Response $rsp)

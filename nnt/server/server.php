@@ -23,7 +23,10 @@ abstract class Server
     }
 
     // 启动服务
-    abstract function start(callable $cb);
+    function start()
+    {
+        $this->onStart();
+    }
 
     protected function onStart()
     {

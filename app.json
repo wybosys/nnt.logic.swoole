@@ -57,6 +57,14 @@
     "container": [
     ],
     "dbms": [
+        {
+            "id": "mysql",
+            "host": "develop.91egame.com",
+            "user": "root",
+            "pwd": "root",
+            "scheme": "test",
+            "entry": "nnt.store.RMysql"
+        }
     ],
     "logger": [
         {

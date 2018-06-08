@@ -92,8 +92,8 @@ class App
         $cfg = App::$CurrentConfig;
         if (isset($cfg->logger))
             Loggers::Start($cfg->logger);
-        if (isset($cfg->dbms))
-            Dbmss::Start($cfg->dbms);
+        //if (isset($cfg->dbms))
+        //    Dbmss::Start($cfg->dbms);
         if (isset($cfg->server))
             Servers::Start($cfg->server);
     }

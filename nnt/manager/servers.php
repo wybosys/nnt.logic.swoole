@@ -2,7 +2,6 @@
 
 namespace Nnt\Manager;
 
-use Nnt\Core\ArrayT;
 use Nnt\Core\ClassT;
 
 class Servers
@@ -12,7 +11,7 @@ class Servers
     static function Start($cfg)
     {
         if (count($cfg)) {
-            ArrayT::ForeachSync($cfg, function ($node, $idx, $next) {
+            foreach ($cfg as $node) {
                 if (!\Nnt\Config\Config::NodeIsEnable($node))
                     return;
 
@@ -24,11 +23,11 @@ class Servers
 
                 if ($srv->config($node)) {
                     self::$_servers[$node->id] = $srv;
-                    $srv->start($next);
+                    $srv->start();
                 } else {
                     echo "$node->id 配置失败";
                 }
-            });
+            }
         }
     }
 }

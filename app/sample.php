@@ -45,6 +45,17 @@ class RSample implements IRouter
         $m->time = DateTime::Current();
         $trans->submit();
     }
+
+    /**
+     * @action(\Nnt\Core\Nil)
+     */
+    function phpinfo(Transaction $trans)
+    {
+        ob_start();
+        phpinfo();
+        $buf = ob_get_flush();
+        $trans->output("text/html", $buf);
+    }
 }
 
 class Sample extends Rest
