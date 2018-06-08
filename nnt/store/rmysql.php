@@ -75,7 +75,7 @@ class RMysql extends Rdb
         try {
             $this->_hdl->connect($cfg);
         } catch (\Throwable $err) {
-            Logger::Fatal("连接失败 mysql@$this->id");
+            Logger::Fatal("连接失败 $this->id@mysql");
         }
     }
 
