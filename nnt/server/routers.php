@@ -59,31 +59,27 @@ class Routers
         }
 
         // 恢复数据上下文
-        go(function () use ($trans) {
-            $trans->collect();
+        $trans->collect();
 
-            // 不做权限判断
-            if (!$trans->expose) {
-                // 访问权限判断
-                if ($trans->needAuth()) {
-                    if (!$trans->auth()) {
-                        $trans->status = STATUS::NEED_AUTH;
-                        $trans->submit();
-                        return;
-                    }
-                } else {
-                    go(function () use ($trans, &$pass) {
-                        $pass = $this->devopscheck($trans);
-                    });
+        // 不做权限判断
+        if (!$trans->expose) {
+            // 访问权限判断
+            if ($trans->needAuth()) {
+                if (!$trans->auth()) {
+                    $trans->status = STATUS::NEED_AUTH;
+                    $trans->submit();
+                    return;
+                }
+            } else {
+                $pass = $this->devopscheck($trans);
 
-                    if (!$pass) {
-                        $trans->status = STATUS::PERMISSIO_FAILED;
-                        $trans->submit();
-                        return;
-                    }
+                if (!$pass) {
+                    $trans->status = STATUS::PERMISSIO_FAILED;
+                    $trans->submit();
+                    return;
                 }
             }
-        });
+        }
 
         if (!method_exists($r, $trans->call)) {
             $trans->status = STATUS::ACTION_NOT_FOUND;

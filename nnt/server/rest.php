@@ -98,7 +98,9 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         // 合并post、get请求
         $params = MapT::Merge($req->get, $req->post, $req->files);
 
-        $this->invoke($params, $req, $rsp);
+        go(function () use (&$params, &$req, &$rsp) {
+            $this->invoke($params, $req, $rsp);
+        });
     }
 
     /**
