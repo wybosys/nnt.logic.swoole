@@ -13,3 +13,7 @@ const release = "release";
 const devops = "devops";
 const devopsdevelop = "devopsdevelop";
 const devopsrelease = "devopsrelease";
+const integer = "integer";
+const boolean = "boolean";
+const string = "string";
+const double = "double";
