@@ -2,6 +2,7 @@
 
 namespace Nnt\Store;
 
+use Nnt\Core\MultiMap;
 use Nnt\Logger\Logger;
 const DEFAULT_PORT = 3306;
 
@@ -18,6 +19,19 @@ class RMysql extends Rdb
     public $user;
     public $pwd;
     public $scheme;
+
+    function clone()
+    {
+        $ret = new RMysql();
+        $ret->id = $this->id;
+        $ret->host = $this->host;
+        $ret->port = $this->port;
+        $ret->sock = $this->sock;
+        $ret->user = $this->user;
+        $ret->pwd = $this->pwd;
+        $ret->scheme = $this->scheme;
+        return $ret;
+    }
 
     function config($cfg): bool
     {
@@ -98,4 +112,25 @@ class RMysql extends Rdb
     {
         $this->_hdl->rollback();
     }
+
+    function pool()
+    {
+        global $POOLS;
+        $h = $POOLS->pop($this->id);
+        if (!$h) {
+            $h = $this->clone();
+            $h->open();
+            $POOLS->push($this->id, $h);
+        }
+        return $h;
+    }
+
+    function repool()
+    {
+        global $POOLS;
+        $POOLS->push($this->id, $this);
+    }
 }
+
+global $POOLS;
+$POOLS = new MultiMap(true);
