@@ -112,8 +112,9 @@ class Transaction
     function run()
     {
         $db = $this->_db->pool();
-        $this->doRun($db);
+        $ret = $this->doRun($db);
         $db->repool();
+        return $ret;
     }
 
     protected function doRun($db)
