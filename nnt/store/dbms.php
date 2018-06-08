@@ -20,6 +20,18 @@ abstract class Dbms
     // 打开连接
     abstract function open();
 
+    // 取得连接池中的连接
+    function pool()
+    {
+        return $this;
+    }
+
+    // 重新放到池里
+    function repool()
+    {
+
+    }
+
     // 事务处理
     function begin()
     {

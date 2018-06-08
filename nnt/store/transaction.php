@@ -109,4 +109,39 @@ class Transaction
     public $nosqlproc;
     public $kvproc;
 
+    function run()
+    {
+        if (!$this->_db)
+            return null;
+        try {
+            if ($this->_rdb) {
+                if ($this->rdbproc)
+                    return ($this->rdbproc)();
+                else
+                    return null;
+            } else if ($this->_nosql) {
+                if ($this->nosqlproc)
+                    return ($this->nosqlproc)();
+                else
+                    return null;
+            } else if ($this->_kv) {
+                if ($this->kvproc)
+                    return ($this->kvproc)();
+                else
+                    return null;
+            } else if ($this->_db) {
+                if ($this->dbproc)
+                    return ($this->dbproc)();
+                else
+                    return null;
+            } else {
+                Logger::Warn("DBMS没有处理此次数据请求");
+                return null;
+            }
+        } catch (\Throwable $err) {
+            Logger::Exception($err);
+            return null;
+        }
+    }
+
 }
