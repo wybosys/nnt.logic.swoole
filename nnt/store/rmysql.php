@@ -95,6 +95,7 @@ class RMysql extends Rdb
 
     function query($cmd)
     {
+        $cmd = $this->_hdl->escape($cmd);
         return $this->_hdl->query($cmd);
     }
 
