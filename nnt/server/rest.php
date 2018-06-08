@@ -69,7 +69,9 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     {
         $hdl = new \Swoole\Http\Server($this->listen ? $this->listen : "0.0.0.0", $this->port);
         $hdl->on('request', function (\Swoole\Http\Request $req, \Swoole\Http\Response $rsp) {
-            $this->doWorker($req, $rsp);
+            go(function () use (&$req, &$rsp) {
+                $this->doWorker($req, $rsp);
+            });
         });
         $hdl->start();
     }
@@ -98,9 +100,8 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         // 合并post、get请求
         $params = MapT::Merge($req->get, $req->post, $req->files);
 
-        go(function () use (&$params, &$req, &$rsp) {
-            $this->invoke($params, $req, $rsp);
-        });
+        // 执行请求
+        $this->invoke($params, $req, $rsp);
     }
 
     /**
