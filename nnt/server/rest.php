@@ -74,6 +74,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
             $this->doWorker($req, $rsp);
         });
 
+        Logger::Info("启动 $this->id@rest");
         $this->hdl->start();
         parent::start();
     }

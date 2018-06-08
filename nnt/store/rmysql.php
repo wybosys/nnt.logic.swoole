@@ -49,15 +49,12 @@ class RMysql extends Rdb
 
     function open()
     {
-        go(function () {
-            $this->doOpen();
-        });
-    }
-
-    protected function doOpen()
-    {
-        if ($this->_hdl)
+        // 只有运行于协程中才能打开
+        // 一般除了初始化时，其他使用数据库的时机均位于协程之中，所以没有运行于协程时同样认为是成功
+        if (\Swoole\Coroutine::getuid() == -1) {
+            Logger::Info("启动 mysql@$this->id");
             return;
+        }
 
         $this->_hdl = new \Swoole\Coroutine\Mysql();
         $cfg = [
@@ -69,17 +66,16 @@ class RMysql extends Rdb
             $cfg['host'] = $this->host;
             $cfg['port'] = $this->port;
         } else if ($this->sock) {
-            $cfg['host'] = $this->host;
+            $cfg['host'] = $this->sock;
         }
         if ($this->user) {
             $cfg['user'] = $this->user;
             $cfg['password'] = $this->pwd;
         }
         try {
-            //$this->_hdl->connect($cfg);
-            Logger::Info("启动 mysql@$this->id");
+            $this->_hdl->connect($cfg);
         } catch (\Throwable $err) {
-            Logger::Fatal("启动失败 mysql@$this->id");
+            Logger::Fatal("连接失败 mysql@$this->id");
         }
     }
 
