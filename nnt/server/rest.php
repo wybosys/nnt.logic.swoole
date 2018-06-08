@@ -68,11 +68,12 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     function start(callable $cb)
     {
         $hdl = new \Swoole\Http\Server($this->listen ? $this->listen : "0.0.0.0", $this->port);
+
+        // request的回调本身就位于协程之中
         $hdl->on('request', function (\Swoole\Http\Request $req, \Swoole\Http\Response $rsp) {
-            go(function () use (&$req, &$rsp) {
-                $this->doWorker($req, $rsp);
-            });
+            $this->doWorker($req, $rsp);
         });
+        
         $hdl->start();
     }
 
