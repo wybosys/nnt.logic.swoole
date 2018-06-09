@@ -10,6 +10,8 @@ use Nnt\Core\Router;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
+use Nnt\Manager\Dbmss;
+use Nnt\Store\Dbms;
 
 // 避免与定义的基础模型找不到
 include_once DIR_NNT . '/core/models.php';
@@ -133,6 +135,17 @@ abstract class Transaction
     public $implOutput;
     private $_outputed;
 
+    // 事务结束
+    protected function onCompleted()
+    {
+        if ($this->_dbs) {
+            foreach ($this->_dbs as $db) {
+                $db->repool();
+            }
+            $this->_dbs = null;
+        }
+    }
+
     function submit(TransactionSubmitOption $opt = null)
     {
         if ($this->_submited) {
@@ -155,6 +168,7 @@ abstract class Transaction
             }
         }
         ($this->implSubmit)($this, $opt);
+        $this->onCompleted();
     }
 
     function output(string $type, $obj)
@@ -170,6 +184,7 @@ abstract class Transaction
         $this->_outputed = true;
         $this->_submited = true;
         ($this->implOutput)($this, $type, $obj);
+        $this->onCompleted();
     }
 
     // 是否把sid返回客户端
@@ -183,6 +198,7 @@ abstract class Transaction
             return STATUS::ACTION_NOT_FOUND;
         $this->expose = $ai->expose;
 
+        // 动作依赖的模型
         $clz = $ai->clazz;
 
         // 检查输入参数
@@ -206,7 +222,7 @@ abstract class Transaction
     // 恢复上下文，涉及到数据的恢复，所以是异步模式
     function collect()
     {
-
+        // 重载实现具体的业务数据收集
     }
 
     // 验证
@@ -216,6 +232,21 @@ abstract class Transaction
         return $mi->auth;
     }
 
+    private $_dbs = null;
+
+    // 拿到对应的数据库操作，事务结束后会自动回收
+    function db($id): Dbms
+    {
+        $fnd = Dbmss::Find($id);
+        if (!$fnd)
+            return null;
+        $db = $fnd->pool();
+        if ($this->_dbs == null)
+            $this->_dbs = [$db];
+        else
+            $this->_dbs[] = $db;
+        return $db;
+    }
 }
 
 class TransactionInfo
