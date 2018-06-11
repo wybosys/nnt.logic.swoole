@@ -4,6 +4,7 @@ namespace Nnt\Store;
 
 use Nnt\Core\MultiMap;
 use Nnt\Logger\Logger;
+
 const DEFAULT_PORT = 3306;
 
 class RMysql extends Rdb
@@ -66,10 +67,17 @@ class RMysql extends Rdb
         // 只有运行于协程中才能打开
         // 一般除了初始化时，其他使用数据库的时机均位于协程之中，所以没有运行于协程时同样认为是成功
         if (\Swoole\Coroutine::getuid() == -1) {
-            Logger::Info("启动 mysql@$this->id");
+            Logger::Info("启动 $this->id@mysql");
             return;
         }
 
+        go(function () {
+            $this->doOpen();
+        });
+    }
+
+    function doOpen()
+    {
         $this->_hdl = new \Swoole\Coroutine\Mysql();
         $cfg = [
             'database' => $this->scheme,
@@ -86,11 +94,7 @@ class RMysql extends Rdb
             $cfg['user'] = $this->user;
             $cfg['password'] = $this->pwd;
         }
-        try {
-            $this->_hdl->connect($cfg);
-        } catch (\Throwable $err) {
-            Logger::Fatal("连接失败 $this->id@mysql");
-        }
+        $this->_hdl->connect($cfg);
     }
 
     function query($cmd)

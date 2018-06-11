@@ -28,9 +28,7 @@ class MultiMap
 
     function push($key, $obj): MultiMap
     {
-        $this->lock();
         $ret = $this->set($key, $obj);
-        $this->unlock();
         return $ret;
     }
 
@@ -38,8 +36,10 @@ class MultiMap
     {
         $this->lock();
         $arr = @$this->_obj[$key];
-        if (!$arr)
+        if (!$arr) {
+            $this->unlock();
             return null;
+        }
         $ret = array_pop($arr);
         $this->unlock();
         return $ret;

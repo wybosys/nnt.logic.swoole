@@ -32,9 +32,20 @@ class Echoo
     public $time;
 }
 
+/**
+ * @model()
+ */
 class MysqlCmd
 {
+    /**
+     * @string(1, [input], "sql")
+     */
+    public $sql;
 
+    /**
+     * @array(2, json, [output], "返回数据")
+     */
+    public $result;
 }
 
 class RSample implements IRouter
@@ -64,6 +75,16 @@ class RSample implements IRouter
         phpinfo();
         $buf = ob_get_flush();
         $trans->output("text/html", $buf);
+    }
+
+    /**
+     * @action(\App\MysqlCmd)
+     */
+    function mysql(Transaction $trans, MysqlCmd $m)
+    {
+        $db = $trans->db("mysql");
+        $m->result = $db->query($m->sql);
+        $trans->submit();
     }
 }
 

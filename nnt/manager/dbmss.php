@@ -29,9 +29,12 @@ class Dbmss
         }
     }
 
-    static function Find(string $id): Dbms
+    /**
+     * @return Dbms
+     */
+    static function Find(string $id)
     {
-        return @self::$_dbs[id];
+        return @self::$_dbs[$id];
     }
 
 }
