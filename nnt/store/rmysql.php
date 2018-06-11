@@ -71,29 +71,26 @@ class RMysql extends Rdb
             return;
         }
 
-        $hdl = new \Swoole\Coroutine\Mysql();
+        $host = null;
+        $user = null;
+        $password = null;
+        $database = $this->scheme;
+        $port = null;
+        $socket = null;
 
-        $cfg = [
-            'database' => $this->scheme,
-            'charset' => 'utf8'
-        ];
         if ($this->host) {
-            $cfg['host'] = $this->host;
-            $cfg['port'] = $this->port;
+            $host = 'p:' . $this->host;
+            $port = $this->port;
         } else if ($this->sock) {
-            $cfg['host'] = $this->sock;
-        }
-        if ($this->user) {
-            $cfg['user'] = $this->user;
-            $cfg['password'] = $this->pwd;
+            $socket = 'p:' . $this->sock;
         }
 
-        try {
-            $hdl->connect($cfg);
-        } catch (\Throwable $err) {
-            Logger::Exception($err);
-            $hdl = null;
+        if ($this->user) {
+            $user = $this->user;
+            $password = $this->pwd;
         }
+
+        $hdl = mysqli_connect($host, $user, $password, $database, $port, $socket);
 
         $this->_hdl = $hdl;
     }
