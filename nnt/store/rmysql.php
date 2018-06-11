@@ -79,10 +79,10 @@ class RMysql extends Rdb
         $socket = null;
 
         if ($this->host) {
-            $host = 'p:' . $this->host;
+            $host = $this->host;
             $port = $this->port;
         } else if ($this->sock) {
-            $socket = 'p:' . $this->sock;
+            $socket = $this->sock;
         }
 
         if ($this->user) {
@@ -92,13 +92,18 @@ class RMysql extends Rdb
 
         $hdl = mysqli_connect($host, $user, $password, $database, $port, $socket);
 
+        if (mysqli_connect_errno()) {
+            throw new \Exception("$this->id@mysql 连接失败 .", mysqli_connect_error(), \Nnt\Core\STATUS::EXCEPTION);
+            $hdl = null;
+        }
+
         $this->_hdl = $hdl;
     }
 
     function query($cmd)
     {
-        $cmd = $this->_hdl->escape($cmd);
-        return $this->_hdl->query($cmd);
+        $cmd = mysqli_escape_string($this->_hdl, $cmd);
+        return mysqli_query($this->_hdl, $cmd);
     }
 
     function begin()
@@ -116,6 +121,15 @@ class RMysql extends Rdb
         $this->_hdl->rollback();
     }
 
+    // 检查是否断开连接
+    protected function testopen()
+    {
+        if (!mysqli_ping($this->_hdl)) {
+            Logger::Log("尝试重新连接mysql");
+            $this->open();
+        }
+    }
+
     function pool()
     {
         global $POOLS;
@@ -125,6 +139,7 @@ class RMysql extends Rdb
             $h->open();
             $POOLS->push($this->id, $h);
         }
+        $h->testopen();
         return $h;
     }
 
