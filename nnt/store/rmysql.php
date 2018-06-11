@@ -57,9 +57,7 @@ class RMysql extends Rdb
         return true;
     }
 
-    /**
-     * @var \Swoole\Coroutine\Mysql
-     */
+    // mysql的连接对象
     protected $_hdl;
 
     function open()
