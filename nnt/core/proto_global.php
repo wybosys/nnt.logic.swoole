@@ -18,3 +18,4 @@ const boolean = "boolean";
 const string = "string";
 const double = "double";
 const json = "json";
+const object = "object";

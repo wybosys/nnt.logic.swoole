@@ -177,6 +177,8 @@ namespace Nnt\Core {
          */
         static function Get($obj): ModelInfo
         {
+            if (is_array($obj))
+                return null;
             $clazz = is_object($obj) ? get_class($obj) : $obj;
             if ($clazz === false)
                 return null;
@@ -235,22 +237,40 @@ namespace Nnt\Core {
                         // 通用类型，则直接可以输出
                         if (in_array($fp->valtype, self::POD_TYPES)) {
                             $arr = [];
-                            if ($fp->valtype == "string") {
-                                foreach ($val as $e) {
-                                    $arr[] = $e ? (string)$e : null;
-                                }
-                            } else if ($fp->valtype == "integer") {
-                                foreach ($val as $e) {
-                                    $arr[] = $e ? (int)$e : null;
-                                }
-                            } else if ($fp->valtype == "double") {
-                                foreach ($val as $e) {
-                                    $arr[] = $e ? (double)$e : null;
-                                }
-                            } else if ($fp->valtype == "boolean") {
-                                foreach ($val as $e) {
-                                    $arr[] = !!$e;
-                                }
+                            switch ($fp->valtype) {
+                                case string:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = $e ? (string)$e : null;
+                                        }
+                                    }
+                                    break;
+                                case integer:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = $e ? (int)$e : null;
+                                        }
+                                    }
+                                    break;
+                                case double:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = $e ? (double)$e : null;
+                                        }
+                                    }
+                                    break;
+                                case boolean:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = !!$e;
+                                        }
+                                    }
+                                    break;
+                                case json:
+                                    {
+                                        $arr[] = $val;
+                                    }
+                                    break;
                             }
                             $r[$fk] = $arr;
                         } else {
@@ -294,6 +314,8 @@ namespace Nnt\Core {
                         $r[$fk] = !!$val;
                     else if ($fp->enum)
                         $r[$fk] = (int)$val;
+                    else if ($fp->json)
+                        $r[$fk] = $val;
                     else {
                         $v = self::Output($val);
                         if ($v == null)
@@ -331,7 +353,7 @@ namespace Nnt\Core {
             return $sta == STATUS::OK;
         }
 
-        const POD_TYPES = ['string', 'integer', 'double', 'boolean'];
+        const POD_TYPES = [string, integer, double, boolean, json];
 
         static function DecodeValue(FieldInfo $fp, $val, $input = true, $output = false)
         {
@@ -344,22 +366,42 @@ namespace Nnt\Core {
                                 // 对于array，约定用，来分割
                                 $val = explode(",", $val);
                             }
-                            if ($fp->valtype == "string") {
-                                foreach ($val as $e) {
-                                    $arr[] = $e ? (string)$e : null;
-                                }
-                            } else if ($fp->valtype == "integer") {
-                                foreach ($val as $e) {
-                                    $arr[] = (int)$e;
-                                }
-                            } else if ($fp->valtype == "double") {
-                                foreach ($val as $e) {
-                                    $arr[] = (double)$e;
-                                }
-                            } else if ($fp->valtype == "boolean") {
-                                foreach ($val as $e) {
-                                    $arr[] = !!$e;
-                                }
+                            switch ($fp->valtype) {
+                                case string:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = $e ? (string)$e : null;
+                                        }
+                                    }
+                                    break;
+                                case integer:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = (int)$e;
+                                        }
+                                    }
+                                    break;
+                                case double:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = (double)$e;
+                                        }
+                                    }
+                                    break;
+                                case boolean:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = !!$e;
+                                        }
+                                    }
+                                    break;
+                                case json:
+                                    {
+                                        foreach ($val as $e) {
+                                            $arr[] = json_decode($e);
+                                        }
+                                    }
+                                    break;
                             }
                         } else {
                             if (is_string($val))
@@ -380,22 +422,42 @@ namespace Nnt\Core {
                 } else if ($fp->map) {
                     $map = [];
                     if (in_array($fp->valtype, self::POD_TYPES)) {
-                        if ($fp->valtype == "string") {
-                            foreach ($val as $ek => $ev) {
-                                $map[$ek] = $ev ? (string)$ev : null;
-                            }
-                        } else if ($fp->valtype == "integer") {
-                            foreach ($val as $ek => $ev) {
-                                $map[$ek] = $ev ? (int)$ev : null;
-                            }
-                        } else if ($fp->valtype == "double") {
-                            foreach ($val as $ek => $ev) {
-                                $map[$ek] = $ev ? (double)$ev : null;
-                            }
-                        } else if ($fp->valtype == "boolean") {
-                            foreach ($val as $ek => $ev) {
-                                $map[$ek] = !!$ev;
-                            }
+                        switch ($fp->valtype) {
+                            case string:
+                                {
+                                    foreach ($val as $ek => $ev) {
+                                        $map[$ek] = $ev ? (string)$ev : null;
+                                    }
+                                }
+                                break;
+                            case integer:
+                                {
+                                    foreach ($val as $ek => $ev) {
+                                        $map[$ek] = $ev ? (int)$ev : null;
+                                    }
+                                }
+                                break;
+                            case double:
+                                {
+                                    foreach ($val as $ek => $ev) {
+                                        $map[$ek] = $ev ? (double)$ev : null;
+                                    }
+                                }
+                                break;
+                            case boolean:
+                                {
+                                    foreach ($val as $ek => $ev) {
+                                        $map[$ek] = !!$ev;
+                                    }
+                                }
+                                break;
+                            case json:
+                                {
+                                    foreach ($val as $ek => $ev) {
+                                        $map[$ek] = json_decode($ev);
+                                    }
+                                }
+                                break;
                         }
                     } else {
                         $clz = $fp->valtype;

@@ -103,22 +103,26 @@ class RMysql extends Rdb
     function query($cmd)
     {
         $cmd = mysqli_escape_string($this->_hdl, $cmd);
-        return mysqli_query($this->_hdl, $cmd);
+        $res = mysqli_query($this->_hdl, $cmd);
+        if ($res) {
+            return mysqli_fetch_all($res, MYSQLI_ASSOC);
+        }
+        return null;
     }
 
     function begin()
     {
-        $this->_hdl->begin();
+        mysqli_begin_transaction($this->_hdl);
     }
 
     function complete()
     {
-        $this->_hdl->commit();
+        mysqli_commit($this->_hdl);
     }
 
     function cancel()
     {
-        $this->_hdl->rollback();
+        mysqli_rollback($this->_hdl);
     }
 
     // 检查是否断开连接
