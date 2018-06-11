@@ -32,6 +32,11 @@ class Echoo
     public $time;
 }
 
+class MysqlCmd
+{
+
+}
+
 class RSample implements IRouter
 {
 

@@ -11,7 +11,6 @@ use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
 use Nnt\Manager\Dbmss;
-use Nnt\Store\Dbms;
 
 // 避免与定义的基础模型找不到
 include_once DIR_NNT . '/core/models.php';
@@ -235,7 +234,7 @@ abstract class Transaction
     private $_dbs = null;
 
     // 拿到对应的数据库操作，事务结束后会自动回收
-    function db($id): Dbms
+    function db($id)
     {
         $fnd = Dbmss::Find($id);
         if (!$fnd)
