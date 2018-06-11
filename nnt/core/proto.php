@@ -268,7 +268,9 @@ namespace Nnt\Core {
                                     break;
                                 case json:
                                     {
-                                        $arr[] = $val;
+                                        foreach ($val as $e) {
+                                            $arr[] = $e;
+                                        }
                                     }
                                     break;
                             }
