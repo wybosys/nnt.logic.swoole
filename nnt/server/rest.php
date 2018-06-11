@@ -98,7 +98,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         }
 
         // 处理url请求
-        Logger::Log($req->server["request_uri"] . "?" . $req->server["query_string"]);
+        Logger::Log($req->server["request_uri"] . "?" . @$req->server["query_string"]);
 
         // 合并post、get请求
         $params = MapT::Merge($req->get, $req->post, $req->files);

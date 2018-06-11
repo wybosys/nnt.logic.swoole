@@ -71,18 +71,11 @@ class RMysql extends Rdb
             return;
         }
 
-        go(function () {
-            $this->doOpen();
-        });
-    }
+        $hdl = new \Swoole\Coroutine\Mysql();
 
-    function doOpen()
-    {
-        $this->_hdl = new \Swoole\Coroutine\Mysql();
         $cfg = [
             'database' => $this->scheme,
-            'charset' => 'utf8',
-            'timeout' => 5
+            'charset' => 'utf8'
         ];
         if ($this->host) {
             $cfg['host'] = $this->host;
@@ -94,7 +87,15 @@ class RMysql extends Rdb
             $cfg['user'] = $this->user;
             $cfg['password'] = $this->pwd;
         }
-        $this->_hdl->connect($cfg);
+
+        try {
+            $hdl->connect($cfg);
+        } catch (\Throwable $err) {
+            Logger::Exception($err);
+            $hdl = null;
+        }
+
+        $this->_hdl = $hdl;
     }
 
     function query($cmd)
