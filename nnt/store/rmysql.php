@@ -138,8 +138,9 @@ class RMysql extends Rdb
             $h = $this->clone();
             $h->open();
             $POOLS->push($this->id, $h);
+        } else {
+            $h->testopen();
         }
-        $h->testopen();
         return $h;
     }
 

@@ -16,12 +16,11 @@ class MultiMap
     function set($key, $obj): MultiMap
     {
         $this->lock();
-        $arr = @$this->_obj[$key];
-        if ($arr === null) {
-            $arr = [];
-            $this->_obj[$key] = $arr;
+        if (isset($this->_obj[$key])) {
+            $this->_obj[$key][] = $obj;
+        } else {
+            $this->_obj[$key] = [$obj];
         }
-        $arr[] = $obj;
         $this->unlock();
         return $this;
     }
