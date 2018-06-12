@@ -13,6 +13,9 @@ spl_autoload_register(function ($classname) {
     return true;
 });
 
+// 当前文件夹设置为工作目录
+chdir(__DIR__);
+
 // 加载入口文件
 include_once "app/main.php";
 main();
