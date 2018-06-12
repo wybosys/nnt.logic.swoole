@@ -135,7 +135,7 @@ class RMysql extends Rdb
     protected function testopen()
     {
         if (!mysqli_ping($this->_hdl)) {
-            Logger::Log("尝试重新连接mysql");
+            Logger::Log("尝试重新连接 $this->id@mysql");
             $this->open();
         }
     }

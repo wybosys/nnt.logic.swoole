@@ -15,7 +15,7 @@ abstract class Kv extends Dbms
     abstract function del(string $key): DbExecuteStat;
 
     // kv数据库通常没有自增函数，所以需要各个业务类自己实现
-    abstract function autoinc(string $ke, $delta);
+    abstract function autoinc(string $key, $delta);
 
     // 增加
     abstract function inc(string $key, $delta);
