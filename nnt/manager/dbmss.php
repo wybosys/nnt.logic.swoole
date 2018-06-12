@@ -13,6 +13,9 @@ class Dbmss
     {
         if (count($cfg)) {
             foreach ($cfg as $node) {
+                if (!\Nnt\Config\Config::NodeIsEnable($node))
+                    continue;
+
                 $srv = ClassT::Instance(ClassT::Entry2Class($node->entry));
                 if (!$srv) {
                     echo "无法实例化 $node->entry";

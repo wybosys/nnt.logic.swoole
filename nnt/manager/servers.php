@@ -13,7 +13,7 @@ class Servers
         if (count($cfg)) {
             foreach ($cfg as $node) {
                 if (!\Nnt\Config\Config::NodeIsEnable($node))
-                    return;
+                    continue;
 
                 $srv = ClassT::Instance(ClassT::Entry2Class($node->entry));
                 if (!$srv) {
