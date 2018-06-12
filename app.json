@@ -64,6 +64,11 @@
             "pwd": "root",
             "scheme": "test",
             "entry": "nnt.store.RMysql"
+        },
+        {
+            "id": "kv",
+            "host": "develop.91egame.com",
+            "entry": "nnt.store.KvRedis"
         }
     ],
     "logger": [

@@ -5,10 +5,10 @@ namespace Nnt\Store;
 use Nnt\Core\MultiMap;
 use Nnt\Logger\Logger;
 
-const DEFAULT_PORT = 3306;
-
 class RMysql extends Rdb
 {
+    const DEFAULT_PORT = 3306;
+
     // 主机名
     public $host;
     public $port;
@@ -48,10 +48,10 @@ class RMysql extends Rdb
             $p = explode(':', $cfg->host);
             if (count($p) == 1) {
                 $this->host = $cfg->host;
-                $this->port = DEFAULT_PORT;
+                $this->port = self::DEFAULT_PORT;
             } else {
-                $this->host = p[0];
-                $this->port = (int)p[1];
+                $this->host = $p[0];
+                $this->port = (int)$p[1];
             }
         }
         return true;

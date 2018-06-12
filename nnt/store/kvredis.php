@@ -5,10 +5,12 @@ namespace Nnt\Store;
 use Nnt\Core\MultiMap;
 use Nnt\Core\STATUS;
 use Nnt\Core\Variant;
-const DEFAULT_PORT = 6379;
+use Nnt\Logger\Logger;
 
 class KvRedis extends Kv
 {
+    const DEFAULT_PORT = 6379;
+
     public $dbid;
     public $host;
     public $port;
@@ -22,13 +24,13 @@ class KvRedis extends Kv
             return false;
         if (!$cfg->host)
             return false;
-        if ($cfg->cluster)
+        if (isset($cfg->cluster) && $cfg->cluster)
             $this->dbid = 0;
         else
             $this->dbid = isset($cfg->dbid) ? $cfg->dbid : 0;
         $arr = explode(':', $cfg->host);
         $this->host = $arr[0];
-        $this->port = count($arr) == 2 ? (int)$arr[1] : DEFAULT_PORT;
+        $this->port = count($arr) == 2 ? (int)$arr[1] : self::DEFAULT_PORT;
         $this->passwd = @$cfg->password;
         if (isset($cfg->timeout))
             $this->timeout = $cfg->timeout;
