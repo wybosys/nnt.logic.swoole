@@ -90,6 +90,8 @@ class RSample implements IRouter
         ob_start();
         phpinfo();
         $buf = ob_get_flush();
+        $buf = explode("\n", $buf);
+        $buf = implode("<br>", $buf);
         $trans->output("text/html", $buf);
     }
 
