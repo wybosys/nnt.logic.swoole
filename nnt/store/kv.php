@@ -6,13 +6,31 @@ use Nnt\Core\Variant;
 
 abstract class Kv extends Dbms
 {
-    abstract function get(string $key): Variant;
+    /**
+     * @param string $key
+     * @return Variant
+     */
+    abstract function get(string $key);
 
-    abstract function set(string $key, Variant $val): bool;
+    /**
+     * @param string $key
+     * @param Variant $val
+     * @return bool
+     */
+    abstract function set(string $key, Variant $val);
 
-    abstract function getset(string $key, Variant $val): Variant;
+    /**
+     * @param string $key
+     * @param Variant $val
+     * @return Variant
+     */
+    abstract function getset(string $key, Variant $val);
 
-    abstract function del(string $key): DbExecuteStat;
+    /**
+     * @param string $key
+     * @return DbExecuteStat
+     */
+    abstract function del(string $key);
 
     // kv数据库通常没有自增函数，所以需要各个业务类自己实现
     abstract function autoinc(string $key, $delta);

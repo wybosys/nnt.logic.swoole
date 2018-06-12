@@ -58,7 +58,7 @@ class KvRedis extends Kv
             return;
         }
 
-        $hdl = new \Swoole\Coroutine\Redis();
+        $hdl = new \Redis();
         $res = $hdl->connect($this->host, $this->port, $this->timeout, null, $this->retry * 1000);
         if (!$res) {
             throw new \Exception($hdl->getLastError(), STATUS::EXCEPTION);
@@ -69,7 +69,7 @@ class KvRedis extends Kv
     }
 
     /**
-     * @var \Swoole\Coroutine\Redis
+     * @var \Redis
      */
     protected $_hdl;
 
@@ -103,7 +103,7 @@ class KvRedis extends Kv
         $POOLS->push($this->id, $this);
     }
 
-    function get(string $key): Variant
+    function get(string $key)
     {
         $v = $this->_hdl->get($key);
         if ($v === false)
@@ -111,7 +111,7 @@ class KvRedis extends Kv
         return Variant::FromString($v);
     }
 
-    function getraw(string $key): string
+    function getraw(string $key)
     {
         $v = $this->_hdl->get($key);
         if ($v === false)
@@ -119,13 +119,18 @@ class KvRedis extends Kv
         return $v;
     }
 
-    function set(string $key, Variant $val): bool
+    function set(string $key, Variant $val)
     {
         $jsstr = $val->serialize();
         return $this->_hdl->set($key, $jsstr);
     }
 
-    function getset(string $key, Variant $val): Variant
+    function setraw(string $key, string $val)
+    {
+        return $this->_hdl->set($key, $val);
+    }
+
+    function getset(string $key, Variant $val)
     {
         $jsstr = $val->serialize();
         $v = $this->_hdl->getSet($key, $jsstr);
@@ -134,7 +139,7 @@ class KvRedis extends Kv
         return Variant::FromString($v);
     }
 
-    function getsetraw(string $key, string $val): string
+    function getsetraw(string $key, string $val)
     {
         $v = $this->_hdl->getSet($key, $val);
         if ($v === false)

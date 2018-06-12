@@ -48,6 +48,22 @@ class MysqlCmd
     public $result;
 }
 
+/**
+ * @model()
+ */
+class RedisCmd
+{
+    /**
+     * @string(1, [input], "key")
+     */
+    public $key;
+
+    /**
+     * @string(2, [input, output, optional], "value不输入则为读取")
+     */
+    public $value;
+}
+
 class RSample implements IRouter
 {
 
@@ -84,6 +100,20 @@ class RSample implements IRouter
     {
         $db = $trans->db("mysql");
         $m->result = $db->query($m->sql);
+        $trans->submit();
+    }
+
+    /**
+     * @action(\App\RedisCmd)
+     */
+    function redis(Transaction $trans, RedisCmd $m)
+    {
+        $db = $trans->db("kv");
+        if ($m->value) {
+            $db->setraw($m->key, $m->value);
+        } else {
+            $m->value = $db->getraw($m->key);
+        }
         $trans->submit();
     }
 }
