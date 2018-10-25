@@ -1,5 +1,9 @@
 <?php
 
+if (extension_loaded('xdebug')) {
+    xdebug_disable();
+}
+
 // 自动加载需要的文件
 spl_autoload_register(function ($classname) {
     // 文件、路径均为小写
