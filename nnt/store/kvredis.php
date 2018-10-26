@@ -119,6 +119,22 @@ class KvRedis extends Kv
         return $v;
     }
 
+    function setTtl(string $key, int $ttl)
+    {
+        if ($ttl == -1) {
+            $this->_hdl->persist($key);
+        } else {
+            $this->_hdl->expire($key, $ttl);
+        }
+    }
+
+    function ttl(string $key, bool $inseconds = true)
+    {
+        if ($inseconds)
+            return $this->_hdl->ttl($key);
+        return $this->_hdl->pttl($key);
+    }
+
     function set(string $key, Variant $val)
     {
         $jsstr = $val->serialize();
@@ -183,6 +199,111 @@ class KvRedis extends Kv
             }
         }
         return $ret;
+    }
+
+    function lpush(string $key, $val)
+    {
+        $this->_hdl->lPush($key, $val);
+    }
+
+    function rpush(string $key, $val)
+    {
+        $this->_hdl->rPush($key, $val);
+    }
+
+    function append(string $key, $val)
+    {
+        $this->_hdl->append($key, $val);
+    }
+
+    function bitAt(string $key, int $offset): int
+    {
+        return $this->_hdl->getBit($key, $offset);
+    }
+
+    function setbit(string $key, int $offset, $val): int
+    {
+        return $this->_hdl->setBit($key, $offset, $val);
+    }
+
+    function batchGet(array $keys)
+    {
+        return $this->_hdl->mget($keys);
+    }
+
+    function batchSet(array $keyvals)
+    {
+        $this->_hdl->mset($keyvals);
+    }
+
+    function mapSet(string $map, string $key, $value)
+    {
+        return $this->_hdl->hSet($map, $key, $value);
+    }
+
+    function mapGet(string $map, string $key)
+    {
+        return $this->_hdl->hGet($map, $key);
+    }
+
+    function mapSize(string $map): int
+    {
+        return $this->_hdl->hLen($map);
+    }
+
+    function mapDelete(string $map, string $key)
+    {
+        return $this->_hdl->hDel($map, $key);
+    }
+
+    function mapKeys(string $map)
+    {
+        return $this->_hdl->hKeys($map);
+    }
+
+    function mapValues(string $map)
+    {
+        return $this->_hdl->hVals($map);
+    }
+
+    function mapContains(string $map, string $key): bool
+    {
+        return $this->_hdl->hExists($map, $key);
+    }
+
+    function orderSet(string $order, string $val, $score)
+    {
+        return $this->_hdl->zAdd($order, $score, $val);
+    }
+
+    function orderRange(string $order, $start, $end, $scores = null)
+    {
+        return $this->_hdl->zRange($order, $start, $end, $scores);
+    }
+
+    function orderDelete(string $order, string $val)
+    {
+        return $this->_hdl->zRem($order, $val);
+    }
+
+    function orderSize(string $order, string $start, string $end)
+    {
+        return $this->_hdl->zCount($order, $start, $end);
+    }
+
+    function orderGetScore(string $order, string $val)
+    {
+        return $this->_hdl->zScore($order, $val);
+    }
+
+    function orderGetIndex(string $order, string $val)
+    {
+        return $this->_hdl->zRank($order, $val);
+    }
+
+    function orderIncrBy(string $order, string $val, $delta)
+    {
+        return $this->_hdl->zIncrBy($order, $delta, $val);
     }
 }
 
