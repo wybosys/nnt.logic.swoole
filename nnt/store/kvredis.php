@@ -122,10 +122,9 @@ class KvRedis extends Kv
     function setTtl(string $key, int $ttl)
     {
         if ($ttl == -1) {
-            $this->_hdl->persist($key);
-        } else {
-            $this->_hdl->expire($key, $ttl);
+            return $this->_hdl->persist($key);
         }
+        return $this->_hdl->expire($key, $ttl);
     }
 
     function ttl(string $key, bool $inseconds = true)
@@ -203,17 +202,17 @@ class KvRedis extends Kv
 
     function lpush(string $key, $val)
     {
-        $this->_hdl->lPush($key, $val);
+        return $this->_hdl->lPush($key, $val);
     }
 
     function rpush(string $key, $val)
     {
-        $this->_hdl->rPush($key, $val);
+        return $this->_hdl->rPush($key, $val);
     }
 
     function append(string $key, $val)
     {
-        $this->_hdl->append($key, $val);
+        return $this->_hdl->append($key, $val);
     }
 
     function bitAt(string $key, int $offset): int
