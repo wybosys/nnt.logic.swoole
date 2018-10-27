@@ -3,12 +3,12 @@
 namespace App\Model;
 
 /**
- * @model()
+ * @model([], \App\Model\Brief)
  */
-class Info
+class Info extends Brief
 {
     /**
      * @string(1, [output])
      */
-    public $test;
+    public $world = "world";
 }

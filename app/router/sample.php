@@ -25,10 +25,7 @@ class Sample implements IRouter
     {
         $m->output = $m->input;
         $m->time = DateTime::Current();
-
-        $info = new Info();
-        $info->test = "hello, world";
-        $m->info = $info;
+        $m->info = new Info();
 
         $trans->submit();
     }
