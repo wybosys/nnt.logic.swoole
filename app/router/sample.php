@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Router;
+
+use App\Model\Echoo;
+use App\Model\Info;
+use App\Model\MysqlCmd;
+use App\Model\RedisCmd;
+use Nnt\Core\DateTime;
+use Nnt\Core\IRouter;
+use Nnt\Server\Transaction;
+
+class Sample implements IRouter
+{
+
+    function action()
+    {
+        return "sample";
+    }
+
+    /**
+     * @action(\App\Model\Echoo)
+     */
+    function echo(Transaction $trans, Echoo $m)
+    {
+        $m->output = $m->input;
+        $m->time = DateTime::Current();
+
+        $info = new Info();
+        $info->test = "hello, world";
+        $m->info = $info;
+
+        $trans->submit();
+    }
+
+    /**
+     * @action(\Nnt\Core\Nil)
+     */
+    function phpinfo(Transaction $trans)
+    {
+        ob_start();
+        phpinfo();
+        $buf = ob_get_flush();
+        $buf = explode("\n", $buf);
+        $buf = implode("<br>", $buf);
+        $trans->output("text/html", $buf);
+    }
+
+    /**
+     * @action(\App\Model\MysqlCmd)
+     */
+    function mysql(Transaction $trans, MysqlCmd $m)
+    {
+        $db = $trans->db("mysql");
+        $m->result = $db->query($m->sql);
+        $trans->submit();
+    }
+
+    /**
+     * @action(\App\Model\RedisCmd)
+     */
+    function redis(Transaction $trans, RedisCmd $m)
+    {
+        $db = $trans->db("kv");
+        if ($m->value) {
+            $db->setraw($m->key, $m->value);
+        } else {
+            $m->value = $db->getraw($m->key);
+        }
+        $trans->submit();
+    }
+}

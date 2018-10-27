@@ -233,8 +233,12 @@ abstract class Transaction
 
     private $_dbs = null;
 
-    // 拿到对应的数据库操作，事务结束后会自动回收
-    function db($id)
+    /**
+     * 拿到对应的数据库操作，事务结束后会自动回收
+     * @param $id app.json中的数据库配置id
+     * @return mixed
+     */
+    function db(string $id)
     {
         $fnd = Dbmss::Find($id);
         if (!$fnd)

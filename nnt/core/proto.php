@@ -70,7 +70,7 @@ namespace Nnt\Core {
         }
     }
 
-    function model($options, $parent): ModelInfo
+    function model($options = [], $parent = null): ModelInfo
     {
         $ret = new ModelInfo();
         $ret->auth = in_array('auth', $options);
@@ -81,7 +81,7 @@ namespace Nnt\Core {
         return $ret;
     }
 
-    function field_($id, $opts, $comment): FieldInfo
+    function field_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = new FieldInfo();
         $ret->id = $id;
@@ -92,35 +92,35 @@ namespace Nnt\Core {
         return $ret;
     }
 
-    function string_($id, $opts, $comment): FieldInfo
+    function string_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->string = true;
         return $ret;
     }
 
-    function boolean_($id, $opts, $comment): FieldInfo
+    function boolean_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->boolean = true;
         return $ret;
     }
 
-    function integer_($id, $opts, $comment): FieldInfo
+    function integer_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->integer = true;
         return $ret;
     }
 
-    function double_($id, $opts, $comment): FieldInfo
+    function double_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->double = true;
         return $ret;
     }
 
-    function array_($id, $clz, $opts, $comment): FieldInfo
+    function array_($id, $clz, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->array = true;
@@ -128,7 +128,7 @@ namespace Nnt\Core {
         return $ret;
     }
 
-    function map_($id, $keytyp, $valtyp, $opts, $comment): FieldInfo
+    function map_($id, $keytyp, $valtyp, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->map = true;
@@ -137,21 +137,21 @@ namespace Nnt\Core {
         return $ret;
     }
 
-    function json_($id, $opts, $comment): FieldInfo
+    function json_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->json = true;
         return $ret;
     }
 
-    function type_($id, $clz, $opts, $comment): FieldInfo
+    function type_($id, $clz, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->valtype = $clz;
         return $ret;
     }
 
-    function enumerate_($id, $clz, $opts, $comment): FieldInfo
+    function enumerate_($id, $clz, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->enum = true;
@@ -159,7 +159,7 @@ namespace Nnt\Core {
         return $ret;
     }
 
-    function file_($id, $opts, $comment): FieldInfo
+    function file_($id, $opts = [], $comment = null): FieldInfo
     {
         $ret = field_($id, $opts, $comment);
         $ret->file = true;
