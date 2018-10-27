@@ -17,6 +17,7 @@ class KvRedis extends Kv
     public $passwd;
     public $timeout = 1;
     public $retry = 0.1;
+    public $prefix = "";
 
     function config($cfg): bool
     {
@@ -28,6 +29,8 @@ class KvRedis extends Kv
             $this->dbid = 0;
         else
             $this->dbid = isset($cfg->dbid) ? $cfg->dbid : 0;
+        if (isset($cfg->prefix))
+            $this->prefix = $cfg->prefix;
         $arr = explode(':', $cfg->host);
         $this->host = $arr[0];
         $this->port = count($arr) == 2 ? (int)$arr[1] : self::DEFAULT_PORT;
@@ -48,6 +51,7 @@ class KvRedis extends Kv
         $ret->passwd = $this->passwd;
         $ret->timeout = $this->timeout;
         $ret->retry = $this->retry;
+        $ret->prefix = $this->prefix;
         return $ret;
     }
 
@@ -103,8 +107,14 @@ class KvRedis extends Kv
         $POOLS->push($this->id, $this);
     }
 
+    protected function key(string $key): string
+    {
+        return $this->prefix . $key;
+    }
+
     function get(string $key)
     {
+        $key = $this->key($key);
         $v = $this->_hdl->get($key);
         if ($v === false)
             return null;
@@ -113,6 +123,7 @@ class KvRedis extends Kv
 
     function getraw(string $key)
     {
+        $key = $this->key($key);
         $v = $this->_hdl->get($key);
         if ($v === false)
             return null;
@@ -121,6 +132,7 @@ class KvRedis extends Kv
 
     function setTtl(string $key, int $ttl)
     {
+        $key = $this->key($key);
         if ($ttl == -1) {
             return $this->_hdl->persist($key);
         }
@@ -129,6 +141,7 @@ class KvRedis extends Kv
 
     function ttl(string $key, bool $inseconds = true)
     {
+        $key = $this->key($key);
         if ($inseconds)
             return $this->_hdl->ttl($key);
         return $this->_hdl->pttl($key);
@@ -136,17 +149,20 @@ class KvRedis extends Kv
 
     function set(string $key, Variant $val)
     {
+        $key = $this->key($key);
         $jsstr = $val->serialize();
         return $this->_hdl->set($key, $jsstr);
     }
 
     function setraw(string $key, string $val)
     {
+        $key = $this->key($key);
         return $this->_hdl->set($key, $val);
     }
 
     function getset(string $key, Variant $val)
     {
+        $key = $this->key($key);
         $jsstr = $val->serialize();
         $v = $this->_hdl->getSet($key, $jsstr);
         if ($v === false)
@@ -156,6 +172,7 @@ class KvRedis extends Kv
 
     function getsetraw(string $key, string $val)
     {
+        $key = $this->key($key);
         $v = $this->_hdl->getSet($key, $val);
         if ($v === false)
             return null;
@@ -164,6 +181,7 @@ class KvRedis extends Kv
 
     function del(string $key): DbExecuteStat
     {
+        $key = $this->key($key);
         $ret = $this->_hdl->del($key);
         $r = new DbExecuteStat();
         $r->remove = $ret;
@@ -173,6 +191,7 @@ class KvRedis extends Kv
     // kv数据库通常没有自增函数，所以需要各个业务类自己实现
     function autoinc(string $key, $delta)
     {
+        $key = $this->key($key);
         if ($delta == 1) {
             $ret = $this->_hdl->incr($key);
         } else {
@@ -184,6 +203,7 @@ class KvRedis extends Kv
     // 增加
     function inc(string $key, $delta)
     {
+        $key = $this->key($key);
         if ($delta > 0) {
             if ($delta == 1) {
                 $ret = $this->_hdl->incr($key);
@@ -202,106 +222,115 @@ class KvRedis extends Kv
 
     function lpush(string $key, $val)
     {
+        $key = $this->key($key);
         return $this->_hdl->lPush($key, $val);
     }
 
     function rpush(string $key, $val)
     {
+        $key = $this->key($key);
         return $this->_hdl->rPush($key, $val);
     }
 
     function append(string $key, $val)
     {
+        $key = $this->key($key);
         return $this->_hdl->append($key, $val);
     }
 
     function bitAt(string $key, int $offset): int
     {
+        $key = $this->key($key);
         return $this->_hdl->getBit($key, $offset);
     }
 
     function setbit(string $key, int $offset, $val): int
     {
+        $key = $this->key($key);
         return $this->_hdl->setBit($key, $offset, $val);
-    }
-
-    function batchGet(array $keys)
-    {
-        return $this->_hdl->mget($keys);
-    }
-
-    function batchSet(array $keyvals)
-    {
-        $this->_hdl->mset($keyvals);
     }
 
     function mapSet(string $map, string $key, $value)
     {
+        $map = $this->key($map);
         return $this->_hdl->hSet($map, $key, $value);
     }
 
     function mapGet(string $map, string $key)
     {
+        $map = $this->key($map);
         return $this->_hdl->hGet($map, $key);
     }
 
     function mapSize(string $map): int
     {
+        $map = $this->key($map);
         return $this->_hdl->hLen($map);
     }
 
     function mapDelete(string $map, string $key)
     {
+        $map = $this->key($map);
         return $this->_hdl->hDel($map, $key);
     }
 
     function mapKeys(string $map)
     {
+        $map = $this->key($map);
         return $this->_hdl->hKeys($map);
     }
 
     function mapValues(string $map)
     {
+        $map = $this->key($map);
         return $this->_hdl->hVals($map);
     }
 
     function mapContains(string $map, string $key): bool
     {
+        $map = $this->key($map);
         return $this->_hdl->hExists($map, $key);
     }
 
     function orderSet(string $order, string $val, $score)
     {
+        $order = $this->key($order);
         return $this->_hdl->zAdd($order, $score, $val);
     }
 
     function orderRange(string $order, $start, $end, $scores = null)
     {
+        $order = $this->key($order);
         return $this->_hdl->zRange($order, $start, $end, $scores);
     }
 
     function orderDelete(string $order, string $val)
     {
+        $order = $this->key($order);
         return $this->_hdl->zRem($order, $val);
     }
 
     function orderSize(string $order, string $start, string $end)
     {
+        $order = $this->key($order);
         return $this->_hdl->zCount($order, $start, $end);
     }
 
     function orderGetScore(string $order, string $val)
     {
+        $order = $this->key($order);
         return $this->_hdl->zScore($order, $val);
     }
 
     function orderGetIndex(string $order, string $val)
     {
+        $order = $this->key($order);
         return $this->_hdl->zRank($order, $val);
     }
 
     function orderIncrBy(string $order, string $val, $delta)
     {
+        $order = $this->key($order);
         return $this->_hdl->zIncrBy($order, $delta, $val);
     }
 }

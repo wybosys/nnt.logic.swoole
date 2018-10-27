@@ -74,6 +74,7 @@
     {
       "id": "kv",
       "host": "develop.91egame.com",
+      "prefix": "sample_",
       "entry": "nnt.store.KvRedis"
     }
   ],
