@@ -100,7 +100,6 @@ class RMysql extends Rdb
 
     function query($cmd)
     {
-        $cmd = mysqli_escape_string($this->_hdl, $cmd);
         $res = mysqli_query($this->_hdl, $cmd);
         if (is_object($res)) {
             $ret = mysqli_fetch_all($res, MYSQLI_ASSOC);
@@ -111,7 +110,6 @@ class RMysql extends Rdb
 
     function execute($cmd): bool
     {
-        $cmd = mysqli_escape_string($this->_hdl, $cmd);
         $res = mysqli_query($this->_hdl, $cmd);
         return $res !== false;
     }
