@@ -6,6 +6,7 @@ use App\Model\Echoo;
 use App\Model\Info;
 use App\Model\MysqlCmd;
 use App\Model\RedisCmd;
+use App\Trans;
 use Nnt\Core\DateTime;
 use Nnt\Core\IRouter;
 use Nnt\Server\Transaction;
@@ -21,7 +22,7 @@ class Sample implements IRouter
     /**
      * @action(\App\Model\Echoo)
      */
-    function echo(Transaction $trans, Echoo $m)
+    function echo(Trans $trans, Echoo $m)
     {
         $m->output = $m->input;
         $m->time = DateTime::Current();
@@ -46,9 +47,9 @@ class Sample implements IRouter
     /**
      * @action(\App\Model\MysqlCmd)
      */
-    function mysql(Transaction $trans, MysqlCmd $m)
+    function mysql(Trans $trans, MysqlCmd $m)
     {
-        $db = $trans->db("mysql");
+        $db = $trans->mysql();
         $m->result = $db->query($m->sql);
         $trans->submit();
     }
@@ -56,9 +57,9 @@ class Sample implements IRouter
     /**
      * @action(\App\Model\RedisCmd)
      */
-    function redis(Transaction $trans, RedisCmd $m)
+    function redis(Trans $trans, RedisCmd $m)
     {
-        $db = $trans->db("kv");
+        $db = $trans->kv();
         if ($m->value) {
             $db->setraw($m->key, $m->value);
         } else {

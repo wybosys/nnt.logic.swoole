@@ -65,7 +65,7 @@
   "dbms": [
     {
       "id": "mysql",
-      "host": "develop.91egame.com",
+      "host": "localhost",
       "user": "root",
       "pwd": "root",
       "scheme": "test",
@@ -73,7 +73,7 @@
     },
     {
       "id": "kv",
-      "host": "develop.91egame.com",
+      "host": "localhost",
       "prefix": "sample_",
       "entry": "nnt.store.KvRedis"
     }
