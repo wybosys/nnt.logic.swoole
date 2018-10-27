@@ -1,30 +1,12 @@
 <?php
 
-// 按照logic定义的规则，自动加载位于命名空间中的类
-spl_autoload_register(function ($classname) {
-    // 文件、路径均为小写
-    $path = str_replace('\\', '/', strtolower($classname));
-    $target = __DIR__ . "/$path.php";
-    if (!is_file($target)) {
-        // 再尝试一次使用类名加载
-        $ps = explode('\\', $classname);
-        $target = __DIR__;
-        for ($i = 0, $l = count($ps); $i < $l - 1; ++$i) {
-            $target .= '/' . strtolower($ps[$i]);
-        }
-        $target .= '/' . $ps[$l - 1] . ".php";
-        if (!is_file($target)) {
-            echo "没有找到类文件 $target\n";
-            return false;
-        }
-    }
-    include_once $target;
-    return true;
-});
-
 // 当前文件夹设置为工作目录
 chdir(__DIR__);
 
+// 初始化框架
+include "nnt/nnt.php";
+
 // 加载入口文件
-include_once "app/main.php";
+include "app/main.php";
+
 main();
