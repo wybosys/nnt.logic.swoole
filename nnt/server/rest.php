@@ -143,7 +143,11 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
             $this->onAfterInvoke($t);
         } catch (\Throwable $err) {
             Logger::Exception($err);
-            $t->status = STATUS::EXCEPTION;
+            $t->message = $err->getMessage();
+            if ($err->getCode() == 0)
+                $t->status = STATUS::EXCEPTION;
+            else
+                $t->status = $err->getCode();
             $t->submit();
         }
     }

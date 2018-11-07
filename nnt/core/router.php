@@ -68,6 +68,10 @@ function action($clazz, $options = null, $comment = null): ActionInfo
 {
     $ret = new ActionInfo();
     $ret->clazz = $clazz;
+    if (is_string($options)) {
+        $comment = $options;
+        $options = null;
+    }
     if ($options) {
         $ret->debug = in_array('debug', $options);
         $ret->develop = in_array('develop', $options);

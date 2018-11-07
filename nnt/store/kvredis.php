@@ -333,6 +333,18 @@ class KvRedis extends Kv
         $order = $this->key($order);
         return $this->_hdl->zIncrBy($order, $delta, $val);
     }
+
+    //获取键
+    function keys(string $key)
+    {
+        $key = $this->key($key);
+        $v = $this->_hdl->keys($key);
+        if ($v === false)
+            return null;
+        return $v;
+    }
+
+
 }
 
 global $POOLS;

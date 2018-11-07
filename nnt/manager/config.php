@@ -96,3 +96,5 @@ class Config
         return getenv('DEVOPS') == null;
     }
 }
+
+define('APP_DIR', dirname(dirname(__DIR__)));

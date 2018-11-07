@@ -4,6 +4,7 @@ namespace Nnt\Render;
 
 use Nnt\Core\ObjectT;
 use Nnt\Core\Proto;
+use Nnt\Core\STATUS;
 use Nnt\Server\Transaction;
 use Nnt\Server\TransactionSubmitOption;
 
@@ -28,7 +29,9 @@ class Json implements IRender
                 "code" => $t->status,
                 "data" => ($opt && $opt->raw) ? $t->model : Proto::Output($t->model)
             ];
-            if ($t->model && $r['data'] === null)
+            if ($t->status != STATUS::OK)
+                $r["error"] = $t->message;
+            else if ($t->model && $r['data'] === null)
                 $r['data'] = [];
         }
         $cmid = ObjectT::Get($t->params, "_cmid");

@@ -30,4 +30,9 @@ class Servers
             }
         }
     }
+
+    static function Find($srvid)
+    {
+        return self::$_servers[$srvid];
+    }
 }
