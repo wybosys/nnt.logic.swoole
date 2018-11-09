@@ -45,10 +45,6 @@ class Permissions
 
     static function IsEnabled(): bool
     {
-        // 如果配置的client时true，则服务器直接接受客户端的请求，不进行权限判断
-        $client = isset(self::DevopsConfig()->config) && self::DevopsConfig()->config;
-        if ($client)
-            return false;
         // 只有devops环境下才具备检测权限的环境
         return Config::IsDevops();
     }
