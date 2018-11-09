@@ -267,16 +267,11 @@ class TransactionInfo
     // 来源
     public $referer;
     public $path;
-}
 
-class TransactionSubmitOption
-{
-    // 仅输出模型
-    public $model;
-
-    // 直接输出数据
-    public $raw;
-
-    // 输出的类型
-    public $type;
+    // 其他http参数
+    public $headers;
+    public $servers;
+    public $gets;
+    public $posts;
+    public $requests;
 }

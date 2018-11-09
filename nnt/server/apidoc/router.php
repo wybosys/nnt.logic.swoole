@@ -9,6 +9,7 @@ use Nnt\Core\Proto;
 use Nnt\Core\Urls;
 use Nnt\Server\Routers;
 use Nnt\Server\Transaction;
+use Nnt\Server\TransactionSubmitOption;
 
 class ParameterInfo
 {
@@ -103,6 +104,23 @@ class Router implements IRouter
     {
         $trans->submit();
     }
+
+    /**
+     * @action(\Nnt\Core\Nil, [])
+     */
+    function description(Transaction $trans)
+    {
+        $op = new TransactionSubmitOption();
+        $op->plain = json_encode([
+            (array)$trans->info->headers,
+            (array)$trans->info->servers,
+            (array)$trans->info->gets,
+            (array)$trans->info->posts,
+            (array)$trans->info->requests
+        ]);
+        $trans->submit($op);
+    }
+
 
     /**
      * @return array ActionInfo

@@ -60,4 +60,32 @@ class ArrayT
             }
         }
     }
+
+    static function At($arr, $key, $def = null)
+    {
+        return isset($arr[$key]) ? $arr[$key] : $def;
+    }
+
+    static function FirstNotNullByKeys($arr, $def, ...$keys)
+    {
+        for ($i = 0, $l = count($keys), $ll = count($arr); $i < $l && $i < $ll; ++$i) {
+            $k = $keys[$i];
+            if (!isset($arr[$k]))
+                continue;
+            $v = $arr[$k];
+            if ($v)
+                return $v;
+        }
+        return $def;
+    }
+
+    static function FirstNotNull($arr, $def = null)
+    {
+        for ($i = 0, $l = count($arr); $i < $l; ++$i) {
+            $v = $arr[$i];
+            if ($v)
+                return $v;
+        }
+        return $def;
+    }
 }

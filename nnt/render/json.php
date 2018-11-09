@@ -18,12 +18,16 @@ class Json implements IRender
     public function render(Transaction $t, TransactionSubmitOption $opt = null): string
     {
         $r = null;
-        if ($opt && $opt->model) {
-            if ($opt->raw)
-                return json_encode($t->model);
-            $r = Proto::Output($t->model);
-            if ($t->model && $r === null)
-                $r = [];
+        if ($opt) {
+            if ($opt->model) {
+                if ($opt->raw)
+                    return json_encode($t->model);
+                $r = Proto::Output($t->model);
+                if ($t->model && $r === null)
+                    $r = [];
+            } else if ($opt->plain) {
+                return $opt->plain;
+            }
         } else {
             $r = [
                 "code" => $t->status,

@@ -2,6 +2,7 @@
 
 namespace Nnt\Server;
 
+use Nnt\Core\ArrayT;
 use Nnt\Core\ClassT;
 use Nnt\Core\DateTime;
 use Nnt\Core\MapT;
@@ -129,13 +130,22 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
 
             // 从请求中保存下信息
             if ($req) {
-                if (isset($params["_agent"]))
-                    $t->info->agent = $params["_agent"];
-                else
-                    $t->info->agent = $req->header["user-agent"];
-                $t->info->host = $req->header["host"];
-                $t->info->addr = $req->server["remote_addr"];
-                $t->info->path = $req->server["path_info"];
+                $t->info->agent = ArrayT::At($params, "_agent", ArrayT::At($req->header, "user-agent"));
+                $t->info->host = ArrayT::At($req->header, "host");
+
+                // 计算客户端ip
+                if (!$t->info->addr) // docker
+                    $t->info->addr = ArrayT::At($req->header, 'http_x_forwarded_for');
+                if (!$t->info->addr) // proxy
+                    $t->info->addr = ArrayT::At($req->header, 'x-forwarded-for');
+                if (!$t->info->addr) // origin
+                    $t->info->addr = ArrayT::At($req->server, 'remote_addr');
+
+                $t->info->path = ArrayT::At($req->server, "path_info");
+                $t->info->headers = $req->header;
+                $t->info->servers = $req->server;
+                $t->info->gets = $req->get;
+                $t->info->posts = $req->post;
             }
 
             $this->onBeforeInvoke($t);
