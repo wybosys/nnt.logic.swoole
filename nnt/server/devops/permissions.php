@@ -11,10 +11,6 @@ class Permissions
     const KEY_SKIPPERMISSION = "_skippermission";
     const REDIS_PERMISSIONIDS = 17;
 
-    // 保存上一次读取的permission数据
-    static $CONFIG_HASH = null;
-    static $PID = null;
-
     static function PID(): string
     {
         $file = APP_DIR . '/run/permission.cfg';
@@ -22,25 +18,16 @@ class Permissions
             throw new \Exception("没有找到文件 $file", STATUS::PERMISSIO_FAILED);
         }
 
-        // 从apcu中读取缓存的pid
-        if (self::$CONFIG_HASH) {
-            $ftime = filemtime($file);
-            if (self::$CONFIG_HASH != $ftime) {
-                $cfg = json_decode(file_get_contents($file));
-                self::$PID = $cfg->id;
-                self::$CONFIG_HASH = $ftime;
-                return self::$PID;
-            } else {
-                return self::$PID;
-            }
+        if (apcu_exists(self::KEY_PERMISSIONID)) {
+            $pid = apcu_fetch(self::KEY_PERMISSIONID);
+            return $pid;
         }
 
-        $ftime = filemtime($file);
         $cfg = json_decode(file_get_contents($file));
-        self::$PID = $cfg->id;
-        self::$CONFIG_HASH = $ftime;
+        $pid = $cfg->id;
+        apcu_store(self::KEY_PERMISSIONID, $pid, 60);
 
-        return self::$PID;
+        return $pid;
     }
 
     static function IsEnabled(): bool
