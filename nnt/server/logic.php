@@ -2,6 +2,8 @@
 
 namespace Nnt\Server;
 
+use Nnt\Logger\Logger;
+
 class Logic extends Server
 {
     /**
@@ -40,7 +42,9 @@ class Logic extends Server
         if (!isset($url['path']))
             $url['path'] = '';
         $new = $url['scheme'] . '://' . $ip . $url['path'];
-        echo "logic的host从" . $host . "自动转换为" . $new;
+
+        Logger::Info("logic的host从" . $host . "自动转换为" . $new);
+
         return $new;
     }
 }
