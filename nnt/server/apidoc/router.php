@@ -3,9 +3,10 @@
 namespace Nnt\Server\Apidoc;
 
 use Nnt\Component\Template;
+use Nnt\Core\AbstractRouter;
 use Nnt\Core\ArrayT;
-use Nnt\Core\IRouter;
 use Nnt\Core\Proto;
+use Nnt\Core\STATUS;
 use Nnt\Core\Urls;
 use Nnt\Server\Routers;
 use Nnt\Server\Transaction;
@@ -45,25 +46,29 @@ class ActionInfo
  */
 class ExportApis
 {
-
     /**
-     * @boolean(1, [input, optional], "生成logic客户端使用的api")
+     * @boolean(1, [input, optional], "生成 logic.node 使用的api")
      */
-    public $logic;
+    public $node;
 
     /**
-     * @boolean(2, [input, optional], "生成h5g游戏使用api")
+     * @boolean(2, [input, optional], "生成 logic.php 使用的api")
+     */
+    public $php;
+
+    /**
+     * @boolean(3, [input, optional], "生成 game.h5 游戏使用api")
      */
     public $h5g;
 
     /**
-     * @boolean(3, [input, optional], "生成vue项目中使用的api")
+     * @boolean(4, [input, optional], "生成 vue 项目中使用的api")
      */
     public $vue;
 }
 
 
-class Router implements IRouter
+class Router extends AbstractRouter
 {
     function __construct()
     {
@@ -100,8 +105,15 @@ class Router implements IRouter
     /**
      * @action(\Nnt\Server\Apidoc\ExportApis, [], "生成api接口文件")
      */
-    function export(Transaction $trans)
+    function export(Transaction $trans, ExportApis $m)
     {
+        if (!$m->node && !$m->php && !$m->h5g && !$m->vue) {
+            $trans->status = STATUS::PARAMETER_NOT_MATCH;
+            $trans->submit();
+            return;
+        }
+
+
         $trans->submit();
     }
 
@@ -121,7 +133,6 @@ class Router implements IRouter
         $trans->submit($op);
     }
 
-
     /**
      * @return array ActionInfo
      */
@@ -140,7 +151,7 @@ class Router implements IRouter
     /**
      * @return array ActionInfo
      */
-    static function RouterActions(IRouter $router)
+    static function RouterActions(AbstractRouter $router)
     {
         $name = $router->action();
         if (isset(self::$_ActionInfos[$name]))

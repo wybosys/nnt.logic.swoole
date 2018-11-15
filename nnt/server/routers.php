@@ -2,7 +2,7 @@
 
 namespace Nnt\Server;
 
-use Nnt\Core\IRouter;
+use Nnt\Core\AbstractRouter;
 use Nnt\Core\ObjectT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
@@ -18,7 +18,7 @@ class Routers
         return count($this->_routers);
     }
 
-    function register(IRouter $obj)
+    function register(AbstractRouter $obj)
     {
         $actnm = $obj->action();
         if (in_array($actnm, $this->_routers)) {

@@ -10,6 +10,7 @@ class ClassT
         try {
             $ret = new $classname();
         } catch (\Throwable $err) {
+            echo $err;
             $ret = $def;
         }
         return $ret;

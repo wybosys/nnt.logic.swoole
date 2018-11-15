@@ -7,11 +7,11 @@ use App\Model\Info;
 use App\Model\MysqlCmd;
 use App\Model\RedisCmd;
 use App\Trans;
+use Nnt\Core\AbstractRouter;
 use Nnt\Core\DateTime;
-use Nnt\Core\IRouter;
 use Nnt\Server\Transaction;
 
-class Sample implements IRouter
+class Sample extends AbstractRouter
 {
 
     function action()

@@ -48,10 +48,14 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
             } else {
                 foreach ($cfg->router as $e => $subcfg) {
                     $router = ClassT::Instance(ClassT::Entry2Class($e));
-                    if (!$router || (isset($router->config) && !$router->config($subcfg))) {
+                    if (!$router) {
                         Logger::Warn("没有找到该实例类型 $e");
                         return false;
                     } else {
+                        if (!$router->config($subcfg)) {
+                            Logger::Warn("$e 配置失败");
+                            return false;
+                        }
                         $this->_routers->register($router);
                     }
                 }

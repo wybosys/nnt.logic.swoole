@@ -2,8 +2,8 @@
 
 namespace Nnt\Server;
 
+use Nnt\Core\AbstractRouter;
 use Nnt\Core\DateTime;
-use Nnt\Core\IRouter;
 use Nnt\Core\ObjectT;
 use Nnt\Core\Proto;
 use Nnt\Core\Router;
@@ -189,7 +189,7 @@ abstract class Transaction
     // 是否把sid返回客户端
     public $responseSessionId = false;
 
-    function modelize(IRouter $r): int
+    function modelize(AbstractRouter $r): int
     {
         $ri = Router::Get($r);
         $ai = @$ri->find($this->call);
