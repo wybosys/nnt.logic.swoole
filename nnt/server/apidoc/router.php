@@ -77,13 +77,26 @@ class Router extends AbstractRouter
     }
 
     /**
-     * @var Template
+     * ApiDoc Template
      */
     private $_page;
+
+    // 配置读取出的用来导出api的配置
+    private $_routers;
+    private $_models;
 
     function action(): string
     {
         return "api";
+    }
+
+    function config($cfg): bool
+    {
+        if (!parent::config($cfg))
+            return false;
+        $this->_routers = @$cfg->export->router;
+        $this->_models = @$cfg->export->model;
+        return true;
     }
 
     /**
@@ -112,6 +125,7 @@ class Router extends AbstractRouter
             $trans->submit();
             return;
         }
+
 
 
         $trans->submit();
