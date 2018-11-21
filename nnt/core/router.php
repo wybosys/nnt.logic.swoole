@@ -2,6 +2,8 @@
 
 namespace Nnt\Core;
 
+use Nnt\Logger\Logger;
+
 /**
  * Class ActionInfo 可以调用的动作信息
  */
@@ -23,55 +25,61 @@ class ActionInfo
      * 限制debug可用
      * @var boolean
      */
-    public $debug;
+    public $debug = false;
 
     /**
      * 不导出
      * @var boolean
      */
-    public $noexport;
+    public $noexport = false;
 
     /**
      * 限制develop可用
      * @var boolean
      */
-    public $develop;
+    public $develop = false;
 
     /**
      * 限制local可用
      * @var boolean
      */
-    public $local;
+    public $local = false;
 
     /**
      * 限制devops可用
      * @var boolean
      */
-    public $devops;
+    public $devops = false;
 
     /**
      * 限制devopsdevelop可用
      * @var boolean
      */
-    public $devopsdevelop;
+    public $devopsdevelop = false;
 
     /**
      * 限制devopsrelease可用
      * @var boolean
      */
-    public $devopsrelease;
+    public $devopsrelease = false;
 
     /**
      * 注释
      * @var string
      */
-    public $comment;
+    public $comment = '';
 
     /**
      * 暴露接口
      * @var boolean
      */
-    public $expose;
+    public $expose = false;
+
+    /**
+     * 缓存时间, =0 代表不缓存，>0代表缓存的时间秒
+     * @var boolean
+     */
+    public $cachetime = 0;
 }
 
 /**
@@ -119,14 +127,45 @@ function action($model, $options = null, $comment = null): ActionInfo
         $options = null;
     }
     if ($options) {
-        $ret->debug = in_array('debug', $options);
-        $ret->develop = in_array('develop', $options);
-        $ret->local = in_array('local', $options);
-        $ret->devops = in_array('devops', $options);
-        $ret->devopsdevelop = in_array('devopsdevelop', $options);
-        $ret->devopsrelease = in_array('devopsrelease', $options);
-        $ret->expose = in_array('expose', $options);
-        $ret->noexport = in_array('noexport', $options);
+        foreach ($options as $option) {
+            switch ($option) {
+                case 'debug':
+                    $ret->debug = true;
+                    break;
+                case 'develop':
+                    $ret->develop = true;
+                    break;
+                case 'local':
+                    $ret->local = true;
+                    break;
+                case 'devops':
+                    $ret->devops = true;
+                    break;
+                case 'devops-develop':
+                case 'devopsdevelop':
+                    $ret->devopsdevelop = true;
+                    break;
+                case 'devops-release':
+                case 'devopsrelease':
+                    $ret->devopsrelease = true;
+                    break;
+                case 'expose':
+                    $ret->expose = true;
+                    break;
+                case 'noexport':
+                    $ret->noexport = true;
+                    break;
+                default:
+                    if (strpos($option, 'cache') !== false) {
+                        if (preg_match('/cache_(\d+)/', $option, $res) === false) {
+                            Logger::Warn("缓存配置错误 " . $option);
+                        } else {
+                            $ret->cachetime = (int)$res[1];
+                        }
+                    }
+                    break;
+            }
+        }
     }
     $ret->comment = $comment;
     return $ret;

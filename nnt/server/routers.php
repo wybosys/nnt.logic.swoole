@@ -4,6 +4,7 @@ namespace Nnt\Server;
 
 use Nnt\Core\AbstractRouter;
 use Nnt\Core\ObjectT;
+use Nnt\Core\Proto;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
 use Nnt\Manager\Config;
@@ -61,23 +62,47 @@ class Routers
         // 恢复数据上下文
         $trans->collect();
 
+        $needauth = false;
+        $auth = null;
+
         // 不做权限判断
         if (!$trans->expose) {
             // 访问权限判断
-            if ($trans->needAuth()) {
-                if (!$trans->auth()) {
+            if ($needauth = $trans->needAuth()) {
+                if (!($auth = $trans->auth())) {
                     $trans->status = STATUS::NEED_AUTH;
                     $trans->submit();
                     return;
                 }
             } else {
                 $pass = $this->devopscheck($trans);
-
                 if (!$pass) {
                     $trans->status = STATUS::PERMISSIO_FAILED;
                     $trans->submit();
                     return;
                 }
+            }
+        }
+
+        // 处理缓存
+        if ($trans->cachetime && $trans->cache) {
+            // 使用模型信息命中缓存(所有input参数+用户的登录信息)
+            $inputs = Proto::Input($trans->model);
+
+            // 如果包含登录信息，则输入参数中加入用户id
+            if ($needauth && $auth) {
+                $inputs['__useridentifier'] = $auth->userIdentifier();
+            }
+
+            // 将inputs转变为key
+            $cachekey = hash("sha256", json_encode($inputs));
+            $record = $trans->cache->cacheLoad($cachekey);
+            if ($record) {
+                $trans->status = STATUS::ACTION_NOT_FOUND;
+                $opt = new TransactionSubmitOption();
+                $opt->plain = $record;
+                $trans->submit($opt);
+                return;
             }
         }
 
@@ -91,6 +116,11 @@ class Routers
         // 不论同步或者异步模式，默认认为是成功的，业务逻辑如果出错则再次设置status为对应的错误码
         $trans->status = STATUS::OK;
         $r->{$trans->call}($trans, $trans->model);
+
+        // 执行成功后，保存缓存
+        if ($trans->cachetime && $trans->cache && $trans->result) {
+            $trans->cache->cacheSave($cachekey, $trans->result, $trans->cachetime);
+        }
     }
 
     // devops下的权限判断

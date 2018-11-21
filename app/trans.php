@@ -2,15 +2,16 @@
 
 namespace App;
 
+use Nnt\Core\IAuthUser;
 use Nnt\Server\Transaction;
 use Nnt\Store\KvRedis;
 use Nnt\Store\RMysql;
 
 class Trans extends Transaction
 {
-    function auth(): bool
+    function auth(): IAuthUser
     {
-        return false;
+        return null;
     }
 
     function sessionId(): string

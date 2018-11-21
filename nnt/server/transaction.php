@@ -4,6 +4,8 @@ namespace Nnt\Server;
 
 use Nnt\Core\AbstractRouter;
 use Nnt\Core\DateTime;
+use Nnt\Core\IAuthUser;
+use Nnt\Core\ICache;
 use Nnt\Core\ObjectT;
 use Nnt\Core\Proto;
 use Nnt\Core\Router;
@@ -36,6 +38,18 @@ abstract class Transaction
     // client的访问地址
     public $clientAddress;
     public $clientPort;
+
+    /**
+     * 配置的缓存
+     * @var ICache
+     */
+    public $cache;
+
+    /**
+     * 缓存时间
+     * @var int
+     */
+    public $cachetime;
 
     // 动作
     private $_action;
@@ -85,7 +99,7 @@ abstract class Transaction
     public $time;
 
     // 是否已经授权
-    abstract function auth(): bool;
+    abstract function auth(): IAuthUser;
 
     /**
      * 环境信息
@@ -215,6 +229,8 @@ abstract class Transaction
             return STATUS::MODEL_ERROR;
         }
 
+        $this->cachetime = $ai->cachetime;
+
         return STATUS::OK;
     }
 
@@ -250,6 +266,9 @@ abstract class Transaction
             $this->_dbs[] = $db;
         return $db;
     }
+
+    // 最终输出的数据
+    public $result;
 }
 
 class TransactionInfo

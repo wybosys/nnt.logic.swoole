@@ -144,6 +144,7 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         try {
             $t->server = $this;
             $t->params = $params;
+            $t->cache = $this->cache;
             $t->setAction($action);
 
             // 从请求中保存下信息
@@ -220,7 +221,8 @@ function TransactionSubmit(Transaction $t, TransactionSubmitOption $opt = null)
         $pl->rsp->header(RESPONSE_SID, $t->sessionId());
     $pl->rsp->status(200);
     $pl->rsp->header("Content-Type", ($opt && $opt->type) ? $opt->type : $render->type());
-    $pl->rsp->end($render->render($t, $opt));
+    $t->result = $render->render($t, $opt);
+    $pl->rsp->end($t->result);
 }
 
 function TransactionOutput(Transaction $t, string $type, $obj)

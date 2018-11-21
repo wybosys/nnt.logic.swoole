@@ -314,6 +314,23 @@ class Proto
         return $ret;
     }
 
+    static function Input($mdl)
+    {
+        $ret = [];
+        if ($mdl == null)
+            return $ret;
+        $mi = self::Get($mdl);
+        foreach ($mi->fields as $name => $field) {
+            if (!$field->input)
+                continue;
+            $v = $mdl[$name];
+            if (!$v)
+                continue;
+            $ret[$name] = $v;
+        }
+        return $ret;
+    }
+
     static function Output($mdl)
     {
         if (!$mdl)
