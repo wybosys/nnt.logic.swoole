@@ -240,7 +240,8 @@ function TransactionOutput(Transaction $t, string $type, $obj)
             $pl->rsp->header('Content-Transfer-Encoding', 'binary');
         }
         $pl->rsp->status(200);
-        $pl->rsp->sendfile($obj->file());
+        //$pl->rsp->sendfile($obj->file());
+        $pl->rsp->end($obj->buffer());
     } else {
         $pl->rsp->status(200);
         $pl->rsp->end((string)$obj);

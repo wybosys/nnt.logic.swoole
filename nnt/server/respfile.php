@@ -57,6 +57,15 @@ class RespFile
         return null;
     }
 
+    function buffer(): string
+    {
+        if ($this->_file)
+            return file_get_contents($this->_file);
+        if ($this->_buf)
+            return $this->_buf;
+        return '';
+    }
+
     function stat($key = null)
     {
         if ($key == null)
