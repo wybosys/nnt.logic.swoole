@@ -5,9 +5,11 @@ namespace Nnt\Server;
 use Nnt\Core\ArrayT;
 use Nnt\Core\ClassT;
 use Nnt\Core\DateTime;
+use Nnt\Core\ICache;
 use Nnt\Core\MapT;
 use Nnt\Core\STATUS;
 use Nnt\Logger\Logger;
+use Nnt\Manager\Dbmss;
 use Nnt\Render\Render;
 
 class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
@@ -27,7 +29,6 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
     {
         if (!parent::config($cfg))
             return false;
-
         if (!isset($cfg->port))
             return false;
         $this->listen = null;
@@ -62,12 +63,25 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
             }
         }
         $this->router = $cfg->router;
+        if (isset($cfg->cache)) {
+            $this->cache = Dbmss::Find($cfg->cache);
+            if (!$this->cache) {
+                Logger::Warn("没有找到配置的缓存数据源 " . $cfg->cache);
+                return false;
+            }
+            if (!($this->cache instanceof ICache)) {
+                Logger::Warn("配置的缓存源没有实现ICache接口 " . $cfg->cache);
+                return false;
+            }
+            //Logger::Info("rest加载缓存");
+        }
         return true;
     }
 
     public $listen;
     public $port;
     public $router;
+    public $cache;
     protected $_hdl;
 
     function start()

@@ -63,7 +63,6 @@ class KvRedis extends Kv
     {
         if (\Swoole\Coroutine::getuid() == -1) {
             Logger::Info("启动 $this->id@redis");
-            return;
         }
 
         if ($this->cluster) {
@@ -77,7 +76,6 @@ class KvRedis extends Kv
             $res = $hdl->connect($this->host, $this->port, $this->timeout, null, $this->retry * 1000);
             if (!$res) {
                 throw new \Exception($hdl->getLastError(), STATUS::EXCEPTION);
-                return;
             }
             if ($this->prefix)
                 $hdl->setOption(\Redis::OPT_PREFIX, $this->prefix);
@@ -320,6 +318,19 @@ class KvRedis extends Kv
         if ($v === false)
             return null;
         return $v;
+    }
+
+    function cacheLoad($key)
+    {
+        return $this->_hdl->get($key);
+    }
+
+    function cacheSave($key, $val, $ttl)
+    {
+        if ($ttl) {
+            return $this->_hdl->setex($key, $ttl, $val);
+        }
+        return $this->_hdl->set($key, $val);
     }
 }
 

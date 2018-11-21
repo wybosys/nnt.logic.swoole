@@ -2,9 +2,10 @@
 
 namespace Nnt\Store;
 
+use Nnt\Core\ICache;
 use Nnt\Core\Variant;
 
-abstract class Kv extends Dbms
+abstract class Kv extends Dbms implements ICache
 {
     /**
      * @param string $key

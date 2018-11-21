@@ -14,6 +14,7 @@
       "port": 8090,
       "entry": "app.Sample",
       "enable": "local",
+      "cache": "kv",
       "router": {
         "nnt.server.apidoc.Router": {
           "export": {
@@ -35,8 +36,9 @@
       "id": "sample",
       "listen": "*",
       "port": 80,
+      "cache": "kv",
       "entry": "app.Sample",
-      "enable": "devops-develop,devops-release",
+      "enable": "devops",
       "router": {
         "nnt.server.apidoc.Router": {
         }
@@ -65,7 +67,15 @@
       "id": "kv",
       "host": "localhost",
       "prefix": "sample_",
-      "entry": "nnt.store.KvRedis"
+      "entry": "nnt.store.KvRedis",
+      "enable": "local"
+    },
+    {
+      "id": "kv",
+      "host": "localhost:26379",
+      "prefix": "sample_",
+      "entry": "nnt.store.KvRedis",
+      "enable": "devops"
     }
   ],
   "logger": [
