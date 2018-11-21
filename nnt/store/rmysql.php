@@ -91,8 +91,7 @@ class RMysql extends Rdb
         $hdl = mysqli_connect($host, $user, $password, $database, $port, $socket);
 
         if (mysqli_connect_errno()) {
-            throw new \Exception("$this->id@mysql 连接失败 .", mysqli_connect_error(), \Nnt\Core\STATUS::EXCEPTION);
-            $hdl = null;
+            throw new \Exception("$this->id@mysql 连接失败 " . mysqli_connect_error(), \Nnt\Core\STATUS::EXCEPTION);
         }
 
         $this->_hdl = $hdl;
