@@ -210,6 +210,7 @@ class Router extends AbstractRouter
         // 遍历所有的路由，生成接口段数据
         foreach ($this->_routers as $router) {
             $clazz = ClassT::Entry2Class($router);
+            $clazzName = Proto::GetClassName($clazz);
 
             $info = \Nnt\Core\Router::Get($clazz);
             foreach ($info->actions as $name => $method) {
@@ -217,8 +218,8 @@ class Router extends AbstractRouter
                     continue;
 
                 $d = [];
-                $d['name'] = ucfirst($router) . ucfirst($name);
-                $d['action'] = "$router.$name";
+                $d['name'] = $clazzName . ucfirst($name);
+                $d['action'] = strtolower($clazzName) . ".$name";
 
                 $cn = Proto::GetClassName($method->model);
                 if ($m->vue || $m->node) {
