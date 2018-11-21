@@ -99,3 +99,9 @@ class App
     }
 
 }
+
+// 处理entry的url转换
+Urls::RegisterScheme("entry", function ($body) {
+    return APP_DIR . '/' . $body;
+});
+

@@ -5,9 +5,11 @@ namespace Nnt\Server\Apidoc;
 use Nnt\Component\Template;
 use Nnt\Core\AbstractRouter;
 use Nnt\Core\ArrayT;
+use Nnt\Core\ClassT;
 use Nnt\Core\Proto;
 use Nnt\Core\STATUS;
 use Nnt\Core\Urls;
+use Nnt\Server\Devops\Permissions;
 use Nnt\Server\Routers;
 use Nnt\Server\Transaction;
 use Nnt\Server\TransactionSubmitOption;
@@ -126,7 +128,26 @@ class Router extends AbstractRouter
             return;
         }
 
+        // 分析出的所有结构
+        $params = [
+            'domain' => Permissions::GetDomain(),
+            'namespace' => "",
+            'clazzes' => [],
+            'enums' => [],
+            'consts' => [],
+            'routers' => []
+        ];
 
+        if ($m->php) {
+            $sp = explode('/', $params['domain']);
+            $params['namespace'] = ucfirst($sp[0]) . '\\' . ucfirst($sp[1]);
+        }
+
+        // 遍历所有模型，生成模型段
+        foreach ($this->_models as $model) {
+            $clazz = ClassT::Entry2Class($model);
+            $clazzname = Proto::GetClassName($clazz);
+        }
 
         $trans->submit();
     }

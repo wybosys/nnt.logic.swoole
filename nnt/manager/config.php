@@ -75,11 +75,14 @@ class Config
         return Config::$DISTRIBUTION ? $r : $d;
     }
 
-    // 支持DEVOPS的架构判断
-    private static $_ISDEVOPS;
-    private static $_ISDEVOPSDEVELOP;
-    private static $_ISDEVOPSRELEASE;
-    private static $_ISLOCAL;
+    static function Use($local, $devopsdevelop, $devopsrelease)
+    {
+        if (self::$LOCAL)
+            return $local;
+        if (self::$DEVOPS_DEVELOP)
+            return $devopsdevelop;
+        return $devopsrelease;
+    }
 
     static function IsLocal()
     {

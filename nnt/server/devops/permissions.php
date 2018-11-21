@@ -48,13 +48,21 @@ class Permissions
         return Config::IsDevops();
     }
 
+    static function GetDomain(): string
+    {
+        return self::$shared->_domain;
+    }
+
     // 和devops.json的配置保持一致
     private $_devops;
 
     // devops配置的domain名
     private $_domain;
 
-    // 单件
+    /**
+     * 单件
+     * @var Permissions
+     */
     static $shared;
 }
 

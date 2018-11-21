@@ -33,7 +33,7 @@ class StringT
     static function SubStr(string $str, int $pos, int $len = 0): string
     {
         if ($len >= 0)
-            return substr($str, $pos, $len == 0 ? null : $len);
+            return $len == 0 ? substr($str, $pos) : substr($str, $pos, $len);
         if ($pos < 0)
             $pos = strlen($str) + $pos;
         $pos += $len;

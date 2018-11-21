@@ -18,13 +18,13 @@
         "nnt.server.apidoc.Router": {
           "export": {
             "router": [
-              "entry://app/router/sample"
+              "app.router.Sample"
             ],
             "model": [
-              "entry://app/model/info.php",
-              "entry://app/model/echoo.php",
-              "entry://app/model/mysqlcmd.php",
-              "entry://app/model/rediscmd.php"
+              "app.model.Info",
+              "app.model.Echoo",
+              "app.model.Mysqlcmd",
+              "app.model.Rediscmd"
             ]
           }
         }
@@ -38,17 +38,6 @@
       "enable": "devops-develop,devops-release",
       "router": {
         "nnt.server.apidoc.Router": {
-          "export": {
-            "router": [
-              "entry://app/router/sample"
-            ],
-            "model": [
-              "entry://app/model/info.php",
-              "entry://app/model/echoo.php",
-              "entry://app/model/mysqlcmd.php",
-              "entry://app/model/rediscmd.php"
-            ]
-          }
         }
       }
     },
