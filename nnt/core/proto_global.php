@@ -23,4 +23,5 @@ namespace {
     const object = "object";
     const constant = "const";
     const enumm = "enumm";
+    const noexport = "noexport";
 }

@@ -146,8 +146,108 @@ class Router extends AbstractRouter
         // 遍历所有模型，生成模型段
         foreach ($this->_models as $model) {
             $clazz = ClassT::Entry2Class($model);
-            $clazzname = Proto::GetClassName($clazz);
+
+            $info = Proto::Get($clazz);
+            if ($info->hidden)
+                continue;
+
+            $clazzName = Proto::GetClassName($clazz);
+
+            // 如果是enum
+            if ($info->enum) {
+                // 静态变量是用类const变量进行的模拟
+                $em = [
+                    'name' => $clazzName,
+                    'defs' => []
+                ];
+                foreach (Proto::ConstsOfClass($model) as $name => $val) {
+                    $em['defs'][] = [
+                        'name' => $name,
+                        'value' => $val
+                    ];
+                }
+                $params['enums'][] = $em;
+            } // 如果是const
+            else if ($info->const) {
+                foreach (Proto::ConstsOfClass($model) as $name => $val) {
+                    $params['consts'][] = [
+                        'name' => strtoupper($clazzName) . '_' . strtoupper($name),
+                        'value' => is_string($val) ? ("\"$val\"") : $val
+                    ];
+                }
+            } // 其他
+            else {
+                $clazz = [
+                    'name' => $clazzName,
+                    'super' => $info->super ? $info->super : "ApiModel",
+                    'fields' => []
+                ];
+                foreach ($info->fields as $name => $field) {
+                    if (!$field->input && !$field->output)
+                        continue;
+
+                    $typ = Proto::FpToTypeDef($field);
+                    if ($m->php) {
+                        $deco = Proto::FpToDecoDefPHP($field);
+                    } else {
+                        $deco = Proto::FpToDecoDef($field, 'Model.');
+                    }
+                    $clazz['fields'][] = [
+                        'name' => $name,
+                        'type' => $typ,
+                        'optional' => $field->optional,
+                        'file' => $field->file,
+                        'enum' => $field->enum,
+                        'input' => $field->input,
+                        'deco' => $deco
+                    ];
+                }
+                $params['clazzes'][] = $clazz;
+            }
         }
+
+        // 遍历所有的路由，生成接口段数据
+        foreach ($this->_routers as $router) {
+            $clazz = ClassT::Entry2Class($router);
+
+            $info = \Nnt\Core\Router::Get($clazz);
+            foreach ($info->actions as $name => $method) {
+                if ($method->noexport)
+                    continue;
+
+                $d = [];
+                $d['name'] = ucfirst($router) . ucfirst($name);
+                $d['action'] = "$router.$name";
+
+                $cn = Proto::GetClassName($method->model);
+                if ($m->vue || $m->node) {
+                    $d['type'] = $cn;
+                } else if ($m->php) {
+                    $d['type'] = 'M' . $cn;
+                } else {
+                    $d['type'] = "models." . $cn;
+                }
+
+                $d['comment'] = $method->comment;
+                $params['routers'][] = $d;
+            }
+        }
+
+        // 渲染模板
+        $apis = APP_DIR . "/nnt/server/apidoc/";
+        if ($m->node)
+            $apis .= "apis-node.dust";
+        else if ($m->h5g)
+            $apis .= "apis-h5g.dust";
+        else if ($m->vue)
+            $apis .= "apis-vue.dust";
+        else if ($m->php)
+            $apis .= "apis-php.dust";
+
+        // 数据填模板
+        $dust = new \Dust\Dust();
+        $tpl = $dust->compileFile($apis);
+        $result = $dust->renderTemplate($tpl, $params);
 
         $trans->submit();
     }

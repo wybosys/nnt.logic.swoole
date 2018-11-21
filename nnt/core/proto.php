@@ -613,4 +613,189 @@ class Proto
         $cmps = explode('\\', $clazz);
         return $cmps[count($cmps) - 1];
     }
+
+    /**
+     * @return int[]
+     * Map<string, int>
+     */
+    static function ConstsOfClass($clazz)
+    {
+        $ret = [];
+        $reflect = new \ReflectionClass($clazz);
+        foreach ($reflect->getConstants() as $name => $val) {
+            $ret[$name] = $val;
+        }
+        return $ret;
+    }
+
+    static function FpToTypeDef(FieldInfo $fp): string
+    {
+        if ($fp->string) {
+            $typ = "string";
+        } else if ($fp->integer) {
+            $typ = "number";
+        } else if ($fp->double) {
+            $typ = "number";
+        } else if ($fp->boolean) {
+            $typ = "boolean";
+        } else if ($fp->array) {
+            $typ = "Array<";
+            switch ($fp->valtype) {
+                case "string":
+                    $vt = "string";
+                    break;
+                case "double":
+                case "integer":
+                    $vt = "number";
+                    break;
+                case "boolean":
+                    $vt = "boolean";
+                    break;
+                default:
+                    $vt = $fp->valtype;
+                    break;
+            }
+            $typ .= $vt;
+            $typ .= ">";
+        } else if ($fp->map) {
+            $typ = "Map<" . self::ValtypeDefToDef($fp->keytype) . ", " . self::ValtypeDefToDef($fp->valtype) . ">";
+        } else if ($fp->multimap) {
+            $typ = "Multimap<" . self::ValtypeDefToDef($fp->keytype) . ", " . self::ValtypeDefToDef($fp->valtype) . ">";
+        } else if ($fp->enum) {
+            $typ = self::GetClassName($fp->valtype);
+        } else if ($fp->file) {
+            if ($fp->input)
+                $typ = "any";
+            else
+                $typ = "string";
+        } else if ($fp->json || $fp->object) {
+            $typ = "Object";
+        } else {
+            $typ = $fp->valtype;
+        }
+        return $typ;
+    }
+
+    static function ValtypeDefToDef($def): string
+    {
+        switch ($def) {
+            case "string":
+                return "string";
+            case "double":
+            case "integer":
+                return "number";
+            case "boolean":
+                return "boolean";
+        }
+
+        return self::GetClassName($def);
+    }
+
+    static function FpToDecoDef(FieldInfo $fp, $ns = ""): string
+    {
+        $deco = null;
+        if ($fp->string)
+            $deco = "@" . $ns . "string(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        else if ($fp->integer)
+            $deco = "@" . $ns . "integer(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        else if ($fp->double)
+            $deco = "@" . $ns . "double(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        else if ($fp->boolean)
+            $deco = "@" . $ns . "boolean(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        else if ($fp->array) {
+            $deco = "@" . $ns . "array(" . $fp->index . ", " . self::FpToValtypeDef($fp, $ns) . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->map) {
+            $deco = "@" . $ns . "map(" . $fp->index . ", " . self::FpToValtypeDef($fp, $ns) . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->multimap) {
+            $deco = "@" . $ns . "multimap(" . $fp->index . ", " . self::FpToValtypeDef($fp, $ns) . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->enum) {
+            $deco = "@" . $ns . "enumerate(" . $fp->index . ", " . self::FpToValtypeDef($fp, $ns) . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->file) {
+            $deco = "@" . $ns . "file(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->json) {
+            $deco = "@" . $ns . "json(" . $fp->index . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        } else {
+            $deco = "@" . $ns . "type(" . $fp->index . ", " . self::FpToValtypeDef($fp, $ns) . ", " . self::FpToOptionsDef($fp, $ns) . self::FpToCommentDef($fp) . ")";
+        }
+        return $deco;
+    }
+
+    static function FpToDecoDefPHP(FieldInfo $fp): string
+    {
+        $deco = null;
+        if ($fp->string) {
+            $deco = "@Api(" . $fp->index . ", [string], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+            $deco .= "\n\t* @var string";
+        } else if ($fp->integer) {
+            $deco = "@Api(" . $fp->index . ", [integer], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+            $deco .= "\n\t* @var int";
+        } else if ($fp->double) {
+            $deco = "@Api(" . $fp->index . ", [double], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+            $deco .= "\n\t* @var double";
+        } else if ($fp->boolean) {
+            $deco = "@Api(" . $fp->index . ", [boolean], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+            $deco .= "\n\t* @var boolean";
+        } else if ($fp->array) {
+            $deco = "@Api(" . $fp->index . ", [array, " . self::FpToValtypeDef($fp) . "], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->map) {
+            $deco = "@Api(" . $fp->index . ", [map, " . self::FpToValtypeDef($fp) . "], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->multimap) {
+            $deco = "@Api(" . $fp->index . ", [multimap, " . self::FpToValtypeDef($fp) . "], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->enum) {
+            $deco = "@Api(" . $fp->index . ", [enum, " . self::FpToValtypeDef($fp) . "], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->file) {
+            $deco = "@Api(" . $fp->index . ", [file], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else if ($fp->json) {
+            $deco = "@Api(" . $fp->index . ", [json], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        } else {
+            $deco = "@Api(" . $fp->index . ", [type, " . self::FpToValtypeDef($fp) . "], " . self::FpToOptionsDef($fp) . self::FpToCommentDef($fp) . ")";
+        }
+        return $deco;
+    }
+
+    static function FpToCommentDef(FieldInfo $fp): string
+    {
+        return $fp->comment ? (', "' . $fp->comment . '"') : "";
+    }
+
+    static function FpToOptionsDef(FieldInfo $fp, $ns = ""): string
+    {
+        $r = [];
+        if ($fp->input)
+            $r[] = $ns . 'input';
+        if ($fp->output)
+            $r[] = $ns . 'output';
+        if ($fp->optional)
+            $r[] = $ns . 'optional';
+        return "[" . implode(', ', $r) . "]";
+    }
+
+    static function FpToValtypeDef(FieldInfo $fp, $ns = ""): string
+    {
+        $t = [];
+        if ($fp->keytype) {
+            $t[] = self::ValtypeDefToDefType($fp->keytype, $ns);
+        }
+        if ($fp->valtype) {
+            $t[] = self::ValtypeDefToDefType($fp->valtype, $ns);
+        }
+        return implode(', ', $t);
+    }
+
+    static function ValtypeDefToDefType($def, $ns = ''): string
+    {
+        switch ($def) {
+            case "string":
+                return $ns . "string_t";
+            case "double":
+            case "integer":
+                return $ns . "number_t";
+            case "boolean":
+                return $ns . "boolean_t";
+            case "object":
+                return "Object";
+        }
+
+        return self::GetClassName($def);
+    }
 }

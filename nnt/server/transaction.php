@@ -198,7 +198,7 @@ abstract class Transaction
         $this->expose = $ai->expose;
 
         // 动作依赖的模型
-        $clz = $ai->clazz;
+        $clz = $ai->model;
 
         // 检查输入参数
         $sta = Proto::CheckInputStatus($clz, $this->params);
