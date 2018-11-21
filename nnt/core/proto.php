@@ -323,7 +323,7 @@ class Proto
         foreach ($mi->fields as $name => $field) {
             if (!$field->input)
                 continue;
-            $v = $mdl[$name];
+            $v = $mdl->{$name};
             if (!$v)
                 continue;
             $ret[$name] = $v;

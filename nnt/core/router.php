@@ -2,6 +2,8 @@
 
 namespace Nnt\Core;
 
+include_once __DIR__ . "/proto_global.php";
+
 use Nnt\Logger\Logger;
 
 /**
@@ -118,7 +120,7 @@ class RouterInfo
     }
 }
 
-function action($model, $options = null, $comment = null): ActionInfo
+function action_($model, $options = null, $comment = ''): ActionInfo
 {
     $ret = new ActionInfo();
     $ret->model = $model;
@@ -203,9 +205,10 @@ class Router
             // 处理action开头的注释
             if (!preg_match('/@action\(([a-zA-Z\\\\]+)(.*)\)/', $plain, $matches))
                 continue;
+
             // 直接执行注释函数
             $res = null;
-            eval("\$res = call_user_func('\Nnt\Core\action', '$matches[1]' $matches[2]);");
+            eval("\$res = call_user_func('\Nnt\Core\action_', '$matches[1]' $matches[2]);");
 
             $res->name = $method->name;
             $ret->actions[$res->name] = $res;

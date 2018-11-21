@@ -100,7 +100,7 @@ class Routers
             if ($record) {
                 $trans->status = STATUS::ACTION_NOT_FOUND;
                 $opt = new TransactionSubmitOption();
-                $opt->plain = $record;
+                //$opt->plain = $record;
                 $trans->submit($opt);
                 return;
             }

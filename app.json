@@ -24,6 +24,7 @@
             "model": [
               "app.model.Brief",
               "app.model.Info",
+              "app.model.Cache",
               "app.model.Echoo",
               "app.model.Mysqlcmd",
               "app.model.Rediscmd"

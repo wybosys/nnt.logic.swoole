@@ -2,6 +2,7 @@
 
 namespace App\Router;
 
+use App\Model\Cache;
 use App\Model\Echoo;
 use App\Model\Info;
 use App\Model\MysqlCmd;
@@ -28,6 +29,15 @@ class Sample extends AbstractRouter
         $m->time = DateTime::Current();
         $m->info = new Info();
 
+        $trans->submit();
+    }
+
+    /**
+     * @action(\App\Model\Cache, [cache_10])
+     */
+    function cache(Trans $trans, Cache $m)
+    {
+        // 自动返回value，如果之前有缓存，即使不输入value，也会显示之前的
         $trans->submit();
     }
 
