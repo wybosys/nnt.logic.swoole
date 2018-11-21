@@ -175,10 +175,12 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
 
     protected function onBeforeInvoke(Transaction $trans)
     {
+        // pass
     }
 
     protected function onAfterInvoke(Transaction $trans)
     {
+        // pass
     }
 
     protected function doInvoke(Transaction $t, $params, \Swoole\Http\Request $req, \Swoole\Http\Response $rsp)

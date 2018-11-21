@@ -10,6 +10,7 @@ use Nnt\Core\Proto;
 use Nnt\Core\STATUS;
 use Nnt\Core\Urls;
 use Nnt\Server\Devops\Permissions;
+use Nnt\Server\RespFile;
 use Nnt\Server\Routers;
 use Nnt\Server\Transaction;
 use Nnt\Server\TransactionSubmitOption;
@@ -249,7 +250,15 @@ class Router extends AbstractRouter
         $tpl = $dust->compileFile($apis);
         $result = $dust->renderTemplate($tpl, $params);
 
-        $trans->submit();
+        // 特殊的输出
+        if ($m->php) {
+            $result = "<?php\n" . $result;
+            $name = str_replace('/', '-', $params['domain']) . '-api.php';
+        } else {
+            $name = str_replace('/', '-', $params['domain']) . '-api.ts';
+        }
+
+        $trans->output('text/plain', RespFile::Plain($result)->asDownload($name));
     }
 
     /**
