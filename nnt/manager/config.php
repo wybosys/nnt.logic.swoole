@@ -83,37 +83,24 @@ class Config
 
     static function IsLocal()
     {
-        return self::$_ISLOCAL;
+        return getenv('DEVOPS') == null;
     }
 
     static function IsDevops()
     {
-        return self::$_ISDEVOPS;
+        return getenv('DEVOPS') != null;
     }
 
     static function IsDevopsDevelop()
     {
-        return self::$_ISDEVOPSDEVELOP;
+        return getenv('DEVOPS') != null && getenv('DEVOPS_RELEASE') == null;
     }
 
     static function IsDevopsRelease()
     {
-        return self::$_ISDEVOPSRELEASE;
+        return getenv('DEVOPS_RELEASE') != null;
     }
-
-    function __construct()
-    {
-        self::$_ISDEVOPS = getenv('DEVOPS') != null;
-        self::$_ISDEVOPSDEVELOP = getenv('DEVOPS') != null && getenv('DEVOPS_RELEASE') == null;
-        self::$_ISDEVOPSRELEASE = getenv('DEVOPS_RELEASE') != null;
-        self::$_ISLOCAL = getenv('DEVOPS') == null;
-    }
-
-    static $shared;
 }
 
 // 定义全局的应用路径
 define('APP_DIR', dirname(dirname(__DIR__)));
-
-// 初始化config的单件，用来初始化一些全局定义
-Config::$shared = new Config();
