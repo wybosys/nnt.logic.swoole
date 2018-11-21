@@ -172,7 +172,7 @@ function model($options = [], $super = null): ModelInfo
 function field_($id, $opts = [], $comment = null): FieldInfo
 {
     $ret = new FieldInfo();
-    $ret->id = $id;
+    $ret->index = $id;
     $ret->input = in_array('input', $opts);
     $ret->output = in_array('output', $opts);
     $ret->optional = in_array('optional', $opts);
@@ -280,6 +280,7 @@ class Proto
     static function ParseClass($clazz): ModelInfo
     {
         $reflect = new \ReflectionClass($clazz);
+
         // 提取model的信息
         $plain = $reflect->getDocComment();
         if (!preg_match('/@model\((\[.*\])?[, ]*(.*)\)/', $plain, $matches))
@@ -292,6 +293,10 @@ class Proto
 
         $props = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
         foreach ($props as $pinfo) {
+            // 过滤掉继承的属性
+            if ($pinfo->getDeclaringClass() != $reflect)
+                continue;
+
             $plain = $pinfo->getDocComment();
 
             // 给所有类加上‘’，然后再调用函数

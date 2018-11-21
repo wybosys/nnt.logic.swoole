@@ -21,6 +21,7 @@
               "app.router.Sample"
             ],
             "model": [
+              "app.model.Brief",
               "app.model.Info",
               "app.model.Echoo",
               "app.model.Mysqlcmd",
