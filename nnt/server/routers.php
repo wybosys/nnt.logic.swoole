@@ -86,6 +86,9 @@ class Routers
 
         // 处理缓存
         if ($trans->cachetime && $trans->cache) {
+            // 获得数据库连接
+            $cache = $trans->db($trans->cache);
+
             // 使用模型信息命中缓存(所有input参数+用户的登录信息)
             $inputs = Proto::Input($trans->model);
 
@@ -96,13 +99,15 @@ class Routers
 
             // 将inputs转变为key
             $cachekey = hash("sha256", json_encode($inputs));
-            $record = $trans->cache->cacheLoad($cachekey);
+            //echo '缓存' . $cachekey;
+            $record = $cache->cacheLoad($cachekey);
             if ($record) {
-                $trans->status = STATUS::ACTION_NOT_FOUND;
                 $opt = new TransactionSubmitOption();
-                //$opt->plain = $record;
+                $opt->plain = $record;
                 $trans->submit($opt);
                 return;
+            } else {
+                //echo '没找到缓存中的数据';
             }
         }
 
@@ -119,7 +124,8 @@ class Routers
 
         // 执行成功后，保存缓存
         if ($trans->cachetime && $trans->cache && $trans->result) {
-            $trans->cache->cacheSave($cachekey, $trans->result, $trans->cachetime);
+            //echo '保存缓存' . $trans->result;
+            $cache->cacheSave($cachekey, $trans->result, $trans->cachetime);
         }
     }
 

@@ -64,16 +64,16 @@ class Rest extends Server implements IRouterable, IHttpServer, IConsoleServer
         }
         $this->router = $cfg->router;
         if (isset($cfg->cache)) {
-            $this->cache = Dbmss::Find($cfg->cache);
-            if (!$this->cache) {
+            $cachesrv = Dbmss::Find($cfg->cache);
+            if (!$cachesrv) {
                 Logger::Warn("没有找到配置的缓存数据源 " . $cfg->cache);
                 return false;
             }
-            if (!($this->cache instanceof ICache)) {
+            if (!($cachesrv instanceof ICache)) {
                 Logger::Warn("配置的缓存源没有实现ICache接口 " . $cfg->cache);
                 return false;
             }
-            //Logger::Info("rest加载缓存");
+            $this->cache = $cfg->cache;
         }
         return true;
     }

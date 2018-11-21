@@ -37,7 +37,8 @@ class Sample extends AbstractRouter
      */
     function cache(Trans $trans, Cache $m)
     {
-        // 自动返回value，如果之前有缓存，即使不输入value，也会显示之前的
+        echo "不经过缓存";
+        $m->value = $m->key . DateTime::Current();
         $trans->submit();
     }
 

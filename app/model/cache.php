@@ -13,7 +13,7 @@ class Cache
     public $key;
 
     /**
-     * @string(2, [input, output, optional], "输出")
+     * @string(2, [output, optional], "输出")
      */
     public $value;
 }

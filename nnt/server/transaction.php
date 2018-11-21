@@ -40,8 +40,8 @@ abstract class Transaction
     public $clientPort;
 
     /**
-     * 配置的缓存
-     * @var ICache
+     * 配置的缓存服务名称
+     * @var string
      */
     public $cache;
 
