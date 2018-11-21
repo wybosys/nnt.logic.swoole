@@ -310,7 +310,7 @@ class Router extends AbstractRouter
             $t = new ActionInfo();
             $t->name = $t->action = "$name.$info->name";
             $t->comment = $info->comment;
-            $t->params = self::ParametersInfo($info->clazz);
+            $t->params = self::ParametersInfo($info->model);
             return $t;
         });
         self::$_ActionInfos[$name] = $r;
@@ -338,7 +338,7 @@ class Router extends AbstractRouter
             $t->map = $fp->map;
             $t->object = $fp->json;
             $t->optional = $fp->optional;
-            $t->index = $fp->id;
+            $t->index = $fp->index;
             $t->input = $fp->input;
             $t->output = $fp->output;
             $t->comment = $fp->comment;
