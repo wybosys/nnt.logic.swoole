@@ -66,17 +66,17 @@
   new Vue({
     delimiters: ['${', '}'],
     el: '#app',
-    data: {            
+    data: {
       actions: {{actions}},
       action: null,
       current: "",
       form: {},
-      inputs: [],      
+      inputs: [],
       outputs: null,
       log: null
     },
     methods: {
-      actSelectAction(info) {        
+      actSelectAction(info) {
         this.action = info;
         this.current = info.name;
         this.log = null;
@@ -125,7 +125,7 @@
           }
           param.def = def;
           param.desc = desc.join(' ');
-        });        
+        });
         // 提取输入参数
         this.inputs = info.params.filter(e=>{
           return e.input;
@@ -139,8 +139,8 @@
       actDropdown() {
 
       },
-      actSubmit() {        
-        this.log = null;        
+      actSubmit() {
+        this.log = null;
         let params = {}; // 普通参数
         let files = {}; // 文件参数
         for (let idx in this.inputs) {
@@ -205,6 +205,7 @@
         }
         if (localStorage.getItem('::nnt::logic::sid'))
             params['_sid'] = localStorage.getItem('::nnt::logic::sid');
+        params['_skippermission'] = 1;
         // 请求数据
         let url = location.href.replace('action=api.doc', 'action=' + this.action.action);
         if (Object.keys(params).length)
