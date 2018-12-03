@@ -32,15 +32,18 @@ class Service
         $url = $host . '/' . $sub . '/?' . http_build_query($args);
         Logger::Info("S2S: $url");
 
-        $options = [
-            'http' => [
-                'method' => 'GET',
-                'header' => 'Content-type:application/x-www-form-urlencoded'
-            ]
-        ];
-        $context = stream_context_create($options);
-        $msg = file_get_contents($url, false, $context);
+        // 初始化curl
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
+        // 解决curl卡顿的问题
+        curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+
+        $msg = curl_exec($ch);
+        curl_close($ch);
+        
         return $msg;
     }
 
