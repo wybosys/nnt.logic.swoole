@@ -2,7 +2,7 @@
 
 namespace Nnt\Core;
 
-abstract class AbstractRouter implements IRouter
+abstract class AbstractRouter
 {
     /**
      * router的标记
