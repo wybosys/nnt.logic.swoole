@@ -2,7 +2,7 @@
 
 namespace Nnt\Server;
 
-use Nnt\Core\AbstractRouter;
+use Nnt\Core\IRouter;
 use Nnt\Core\ObjectT;
 use Nnt\Core\Proto;
 use Nnt\Core\STATUS;
@@ -19,7 +19,7 @@ class Routers
         return count($this->_routers);
     }
 
-    function register(AbstractRouter $obj)
+    function register(IRouter $obj)
     {
         $actnm = $obj->action();
         if (in_array($actnm, $this->_routers)) {
