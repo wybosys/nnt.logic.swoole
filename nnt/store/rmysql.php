@@ -97,6 +97,14 @@ class RMysql extends Rdb
         $this->_hdl = $hdl;
     }
 
+    function close()
+    {
+        if ($this->_hdl) {
+            mysqli_close($this->_hdl);
+            $this->_hdl = null;
+        }
+    }
+
     function query($cmd)
     {
         $res = mysqli_query($this->_hdl, $cmd);
@@ -133,6 +141,7 @@ class RMysql extends Rdb
     {
         if (!mysqli_ping($this->_hdl)) {
             Logger::Log("尝试重新连接 $this->id@mysql");
+            $this->close();
             $this->open();
         }
     }

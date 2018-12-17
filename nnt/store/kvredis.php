@@ -84,6 +84,14 @@ class KvRedis extends Kv
         $this->_hdl = $hdl;
     }
 
+    function close()
+    {
+        if ($this->_hdl) {
+            $this->_hdl->close();
+            $this->_hdl = null;
+        }
+    }
+
     /**
      * @var \Redis
      */
@@ -92,9 +100,10 @@ class KvRedis extends Kv
     protected function testopen()
     {
         try {
-            $this->_hdl->ping();
+            $this->_hdl->ping('alive');
         } catch (\Throwable $err) {
             Logger::Log("尝试重新连接 $this->id@redis");
+            $this->close();
             $this->open();
         }
     }
