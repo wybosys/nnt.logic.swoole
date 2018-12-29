@@ -2,7 +2,6 @@
 
 namespace Nnt\Store;
 
-use Nnt\Core\MultiMap;
 use Nnt\Core\STATUS;
 use Nnt\Core\Variant;
 use Nnt\Logger\Logger;
@@ -96,37 +95,6 @@ class KvRedis extends Kv
      * @var \Redis
      */
     protected $_hdl;
-
-    protected function testopen()
-    {
-        try {
-            $this->_hdl->ping('alive');
-        } catch (\Throwable $err) {
-            Logger::Log("尝试重新连接 $this->id@redis");
-            $this->close();
-            $this->open();
-        }
-    }
-
-    function pool()
-    {
-        global $POOLS;
-        $h = $POOLS->pop($this->id);
-        if (!$h) {
-            $h = $this->clone();
-            $h->open();
-            $POOLS->push($this->id, $h);
-        } else {
-            $h->testopen();
-        }
-        return $h;
-    }
-
-    function repool()
-    {
-        global $POOLS;
-        $POOLS->push($this->id, $this);
-    }
 
     function get(string $key)
     {
@@ -342,6 +310,3 @@ class KvRedis extends Kv
         return $this->_hdl->set($key, $val);
     }
 }
-
-global $POOLS;
-$POOLS = new MultiMap(true);

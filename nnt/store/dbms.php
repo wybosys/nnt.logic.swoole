@@ -20,28 +20,28 @@ abstract class Dbms
     // 打开连接
     abstract function open();
 
-    // 取得连接池中的连接
-    function pool()
-    {
-        return $this;
-    }
+    // 关闭连接
+    abstract function close();
 
-    // 重新放到池里
-    function repool()
-    {
-
-    }
+    /**
+     * 复制当前配置
+     * @return Dbms
+     */
+    abstract function clone();
 
     // 事务处理
     function begin()
     {
+        // pass
     }
 
     function complete()
     {
+        // pass
     }
 
     function cancel()
     {
+        // pass
     }
 }

@@ -151,12 +151,10 @@ abstract class Transaction
     // 事务结束
     protected function onCompleted()
     {
-        if ($this->_dbs) {
-            foreach ($this->_dbs as $db) {
-                $db->repool();
-            }
-            $this->_dbs = null;
+        foreach ($this->_dbs as $db) {
+            $db->close();
         }
+        $this->_dbs = [];
     }
 
     function submit(TransactionSubmitOption $opt = null)
@@ -247,7 +245,7 @@ abstract class Transaction
         return $mi->auth;
     }
 
-    private $_dbs = null;
+    private $_dbs = [];
 
     /**
      * 拿到对应的数据库操作，事务结束后会自动回收
@@ -256,14 +254,17 @@ abstract class Transaction
      */
     function db(string $id)
     {
+        // 如果本地已经打开连接，则直接获取
+        $db = @$this->_dbs[$id];
+        if ($db)
+            return $db;
+        // 找到该数据库的原始连接，并复制打开一个新连接
         $fnd = Dbmss::Find($id);
         if (!$fnd)
             return null;
-        $db = $fnd->pool();
-        if ($this->_dbs == null)
-            $this->_dbs = [$db];
-        else
-            $this->_dbs[] = $db;
+        $db = $fnd->clone();
+        $db->open();
+        $this->_dbs[$id] = $db;
         return $db;
     }
 
